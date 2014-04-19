@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<configuration>
+<property>
+<name>fs.default.name</name>
+<value>file:///</value>
+</property>
+<property>
+<name>mapred.job.tracker</name>
+<value>local</value>
+</property>
+<property>
+<name>mapred.map.output.compression.codec</name>
+<value>org.apache.hadoop.io.compress.DefaultCodec</value>
+</property>
+
+
+</configuration>
+
