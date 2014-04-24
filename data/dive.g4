@@ -28,7 +28,7 @@
  *                https://github.com/bkiers/sqlite-parser
  * Developed by : Bart Kiers, bart@big-o.nl
  */
-grammar SQLite;
+grammar dive;
 
 parse
  : ( sql_stmt_list | error )* EOF
@@ -47,59 +47,9 @@ sql_stmt_list
  ;
 
 sql_stmt
- : ( K_EXPLAIN ( K_QUERY K_PLAN )? )? ( alter_table_stmt
-                                      | analyze_stmt
-                                      | attach_stmt
-                                      | begin_stmt
-                                      | commit_stmt
-                                      | compound_select_stmt
-                                      | create_index_stmt
-                                      | create_table_stmt
-                                      | create_trigger_stmt
-                                      | create_view_stmt
-                                      | create_virtual_table_stmt
-                                      | delete_stmt
-                                      | delete_stmt_limited
-                                      | detach_stmt
-                                      | drop_index_stmt
-                                      | drop_table_stmt
-                                      | drop_trigger_stmt
-                                      | drop_view_stmt
-                                      | factored_select_stmt
-                                      | insert_stmt
-                                      | pragma_stmt
-                                      | reindex_stmt
-                                      | release_stmt
-                                      | rollback_stmt
-                                      | savepoint_stmt
-                                      | simple_select_stmt
-                                      | select_stmt
-                                      | update_stmt
-                                      | update_stmt_limited
-                                      | vacuum_stmt )
- ;
-
-alter_table_stmt
- : K_ALTER K_TABLE ( database_name '.' )? table_name
-   ( K_RENAME K_TO new_table_name
-   | K_ADD K_COLUMN? column_def
-   )
- ;
-
-analyze_stmt
- : K_ANALYZE ( database_name | table_or_index_name | database_name '.' table_or_index_name )?
- ;
-
-attach_stmt
- : K_ATTACH K_DATABASE? expr K_AS database_name
- ;
-
-begin_stmt
- : K_BEGIN ( K_DEFERRED | K_IMMEDIATE | K_EXCLUSIVE )? ( K_TRANSACTION transaction_name? )?
- ;
-
-commit_stmt
- : ( K_COMMIT | K_END ) ( K_TRANSACTION transaction_name? )?
+:  ( create_table_stmt
+    | simple_select_stmt
+    | select_stmt)
  ;
 
 compound_select_stmt
@@ -109,11 +59,6 @@ compound_select_stmt
    ( K_LIMIT expr ( ( K_OFFSET | ',' ) expr )? )?
  ;
 
-create_index_stmt
- : K_CREATE K_UNIQUE? K_INDEX ( K_IF K_NOT K_EXISTS )?
-   ( database_name '.' )? index_name K_ON table_name '(' indexed_column ( ',' indexed_column )* ')'
-   ( K_WHERE expr )?
- ;
 
 create_table_stmt
  : K_CREATE ( K_TEMP | K_TEMPORARY )? K_TABLE ( K_IF K_NOT K_EXISTS )?
@@ -122,107 +67,8 @@ create_table_stmt
    | K_AS select_stmt 
    )
  ;
-
-create_trigger_stmt
- : K_CREATE ( K_TEMP | K_TEMPORARY )? K_TRIGGER ( K_IF K_NOT K_EXISTS )?
-   ( database_name '.' )? trigger_name ( K_BEFORE  | K_AFTER | K_INSTEAD K_OF )? 
-   ( K_DELETE | K_INSERT | K_UPDATE ( K_OF column_name ( ',' column_name )* )? ) K_ON ( database_name '.' )? table_name
-   ( K_FOR K_EACH K_ROW )? ( K_WHEN expr )?
-   K_BEGIN ( ( update_stmt | insert_stmt | delete_stmt | select_stmt ) ';' )+ K_END
- ;
-
-create_view_stmt
- : K_CREATE ( K_TEMP | K_TEMPORARY )? K_VIEW ( K_IF K_NOT K_EXISTS )?
-   ( database_name '.' )? view_name K_AS select_stmt
- ;
-
-create_virtual_table_stmt
- : K_CREATE K_VIRTUAL K_TABLE ( K_IF K_NOT K_EXISTS )?
-   ( database_name '.' )? table_name
-   K_USING module_name ( '(' module_argument ( ',' module_argument )* ')' )?
- ;
-
-delete_stmt
- : with_clause? K_DELETE K_FROM qualified_table_name 
-   ( K_WHERE expr )?
- ;
-
-delete_stmt_limited
- : with_clause? K_DELETE K_FROM qualified_table_name 
-   ( K_WHERE expr )?
-   ( ( K_ORDER K_BY ordering_term ( ',' ordering_term )* )?
-     K_LIMIT expr ( ( K_OFFSET | ',' ) expr )?
-   )?
- ;
-
-detach_stmt
- : K_DETACH K_DATABASE? database_name
- ;
-
-drop_index_stmt
- : K_DROP K_INDEX ( K_IF K_EXISTS )? ( database_name '.' )? index_name
- ;
-
-drop_table_stmt
- : K_DROP K_TABLE ( K_IF K_EXISTS )? ( database_name '.' )? table_name
- ;
-
-drop_trigger_stmt
- : K_DROP K_TRIGGER ( K_IF K_EXISTS )? ( database_name '.' )? trigger_name
- ;
-
-drop_view_stmt
- : K_DROP K_VIEW ( K_IF K_EXISTS )? ( database_name '.' )? view_name
- ;
-
-factored_select_stmt
- : ( K_WITH K_RECURSIVE? common_table_expression ( ',' common_table_expression )* )?
-   select_core ( compound_operator select_core )*
-   ( K_ORDER K_BY ordering_term ( ',' ordering_term )* )?
-   ( K_LIMIT expr ( ( K_OFFSET | ',' ) expr )? )?
- ;
-
-insert_stmt
- : with_clause? ( K_INSERT 
-                | K_REPLACE
-                | K_INSERT K_OR K_REPLACE
-                | K_INSERT K_OR K_ROLLBACK
-                | K_INSERT K_OR K_ABORT
-                | K_INSERT K_OR K_FAIL
-                | K_INSERT K_OR K_IGNORE ) K_INTO
-   ( database_name '.' )? table_name ( '(' column_name ( ',' column_name )* ')' )?
-   ( K_VALUES '(' expr ( ',' expr )* ')' ( ',' '(' expr ( ',' expr )* ')' )*
-   | select_stmt
-   | K_DEFAULT K_VALUES
-   )
- ;
-
-pragma_stmt
- : K_PRAGMA ( database_name '.' )? pragma_name ( '=' pragma_value
-                                               | '(' pragma_value ')' )?
- ;
-
-reindex_stmt
- : K_REINDEX ( collation_name
-             | ( database_name '.' )? ( table_name | index_name )
-             )?
- ;
-
-release_stmt
- : K_RELEASE K_SAVEPOINT? savepoint_name
- ;
-
-rollback_stmt
- : K_ROLLBACK ( K_TRANSACTION transaction_name? )? ( K_TO K_SAVEPOINT? savepoint_name )?
- ;
-
-savepoint_stmt
- : K_SAVEPOINT savepoint_name
- ;
-
 simple_select_stmt
- : ( K_WITH K_RECURSIVE? common_table_expression ( ',' common_table_expression )* )?
-   select_core ( K_ORDER K_BY ordering_term ( ',' ordering_term )* )?
+ : select_core ( K_ORDER K_BY ordering_term ( ',' ordering_term )* )?
    ( K_LIMIT expr ( ( K_OFFSET | ',' ) expr )? )?
  ;
 
@@ -240,6 +86,37 @@ select_or_values
    ( K_GROUP K_BY expr ( ',' expr )* ( K_HAVING expr )? )?
  | K_VALUES '(' expr ( ',' expr )* ')' ( ',' '(' expr ( ',' expr )* ')' )*
  ;
+
+delete_stmt
+ : with_clause? K_DELETE K_FROM qualified_table_name 
+   ( K_WHERE expr )?
+ ;
+
+delete_stmt_limited
+ : with_clause? K_DELETE K_FROM qualified_table_name 
+   ( K_WHERE expr )?
+   ( ( K_ORDER K_BY ordering_term ( ',' ordering_term )* )?
+     K_LIMIT expr ( ( K_OFFSET | ',' ) expr )?
+   )?
+ ;
+
+
+insert_stmt
+ : with_clause? ( K_INSERT 
+                | K_REPLACE
+                | K_INSERT K_OR K_REPLACE
+                | K_INSERT K_OR K_ROLLBACK
+                | K_INSERT K_OR K_ABORT
+                | K_INSERT K_OR K_FAIL
+                | K_INSERT K_OR K_IGNORE ) K_INTO
+   ( database_name '.' )? table_name ( '(' column_name ( ',' column_name )* ')' )?
+   ( K_VALUES '(' expr ( ',' expr )* ')' ( ',' '(' expr ( ',' expr )* ')' )*
+   | select_stmt
+   | K_DEFAULT K_VALUES
+   )
+ ;
+
+
 
 update_stmt
  : with_clause? K_UPDATE ( K_OR K_ROLLBACK
@@ -299,26 +176,15 @@ conflict_clause
 
 expr
  : literal_value
- | BIND_PARAMETER
- | ( ( database_name '.' )? table_name '.' )? column_name
+ | ( table_name '.' )? column_name
  | unary_operator expr
  | expr binary_operator expr
- | function_name '(' ( K_DISTINCT? expr ( ',' expr )* | '*' )? ')'
  | '(' expr ')'
- | K_CAST '(' expr K_AS type_name ')'
- | expr K_COLLATE collation_name
- | expr K_NOT? ( K_LIKE | K_GLOB | K_REGEXP | K_MATCH ) expr ( K_ESCAPE expr )?
- | expr ( K_ISNULL | K_NOTNULL | K_NOT K_NULL )
- | expr K_IS K_NOT? expr
- | expr K_NOT? K_BETWEEN expr K_AND expr
  | expr K_NOT? K_IN ( '(' ( select_stmt
                           | expr ( ',' expr )*
                           )? 
                       ')'
                     | ( database_name '.' )? table_name )
- | ( ( K_NOT )? K_EXISTS )? '(' select_stmt ')'
- | K_CASE expr? ( K_WHEN expr K_THEN expr )+ ( K_ELSE expr )? K_END
- | raise_function
  ;
 
 foreign_key_clause
@@ -378,13 +244,10 @@ common_table_expression
 result_column
  : '*'
  | table_name '.' '*'
- | expr ( K_AS? column_alias )?
  ;
 
 table_or_subquery
- : ( database_name '.' )? table_name ( K_AS? table_alias )?
-   ( K_INDEXED K_BY index_name
-   | K_NOT K_INDEXED )?
+ :  table_name 
  | '(' ( table_or_subquery ( ',' table_or_subquery )*
        | join_clause )
    ')' ( K_AS? table_alias )?
@@ -406,7 +269,7 @@ join_constraint
  ;
 
 select_core
- : K_SELECT ( K_DISTINCT | K_ALL )? result_column ( ',' result_column )*
+ : K_SELECT result_column {System.err.println("get result_column: " + $result_column.text} ( ',' result_column )*
    ( K_FROM ( table_or_subquery ( ',' table_or_subquery )* | join_clause ) )?
    ( K_WHERE expr )?
    ( K_GROUP K_BY expr ( ',' expr )* ( K_HAVING expr )? )?
