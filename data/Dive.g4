@@ -242,8 +242,9 @@ common_table_expression
  ;
 
 result_column
- : '*'
- | table_name '.' '*'
+ : '*' # StarColumn
+ | column_name # ColumnName
+ | aggregation_function '(' column_name ')' # AggregationOperation
  ;
 
 table_or_subquery
@@ -255,7 +256,7 @@ table_or_subquery
  ;
 
 join_clause
- : table_or_subquery ( join_operator table_or_subquery join_constraint )*
+ : table_name ( join_operator table_name join_constraint )*
  ;
 
 join_operator
@@ -269,11 +270,10 @@ join_constraint
  ;
 
 select_core
- : K_SELECT result_column {System.err.println("get result_column: " + $result_column.text);} ( ',' result_column )*
-   ( K_FROM ( table_or_subquery ( ',' table_or_subquery )* | join_clause ) )?
+ : K_SELECT rcol+=result_column ( ',' rcol+=result_column )*
+   ( K_FROM ( table_name join_clause* ) )?
    ( K_WHERE expr )?
    ( K_GROUP K_BY expr ( ',' expr )* ( K_HAVING expr )? )?
- | K_VALUES '(' expr ( ',' expr )* ')' ( ',' '(' expr ( ',' expr )* ')' )*
  ;
 
 compound_operator
@@ -299,6 +299,14 @@ literal_value
  | K_CURRENT_TIME
  | K_CURRENT_DATE
  | K_CURRENT_TIMESTAMP
+ ;
+
+aggregation_function
+ : K_SUM
+ | K_MAX
+ | K_MIN
+ | K_AVG
+ | K_COUNT
  ;
 
 unary_operator
@@ -345,6 +353,7 @@ column_alias
  : IDENTIFIER
  | STRING_LITERAL
  ;
+
 
 keyword
  : K_ABORT
@@ -471,6 +480,11 @@ keyword
  | K_WHERE
  | K_WITH
  | K_WITHOUT
+ | K_MAX
+ | K_MIN
+ | K_SUM
+ | K_COUNT
+ | K_AVG
  ;
 
 // TODO check all names below
@@ -700,6 +714,12 @@ K_WHEN : W H E N;
 K_WHERE : W H E R E;
 K_WITH : W I T H;
 K_WITHOUT : W I T H O U T;
+K_SUM : S U M;
+K_MAX : M A X;
+K_MIN : M I N;
+K_AVG : A V G;
+K_COUNT : C O U N T;
+
 
 IDENTIFIER
  : '"' (~'"' | '""')* '"'
