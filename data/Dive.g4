@@ -30,6 +30,10 @@
  */
 grammar Dive;
 
+@header {
+import java.util.*;	
+}
+
 parse
  : ( sql_stmt_list | error )* EOF
  ;
@@ -270,6 +274,9 @@ join_constraint
  ;
 
 select_core
+locals [
+	List<String> resultColumns = new ArrayList<String>();
+] 
  : K_SELECT rcol+=result_column ( ',' rcol+=result_column )*
    ( K_FROM ( table_name join_clause* ) )?
    ( K_WHERE expr )?
