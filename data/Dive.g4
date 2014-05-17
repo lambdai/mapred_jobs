@@ -259,6 +259,10 @@ table_or_subquery
  | '(' select_stmt ')' ( K_AS? table_alias )?
  ;
 
+natural_join_clause
+ : (K_NATURAL K_JOIN table_name)*
+ ;
+ 
 join_clause
  : table_name ( join_operator table_name join_constraint )*
  ;
@@ -278,7 +282,7 @@ locals [
 	List<String> resultColumns = new ArrayList<String>();
 ] 
  : K_SELECT rcol+=result_column ( ',' rcol+=result_column )*
-   ( K_FROM ( table_name join_clause* ) )?
+   K_FROM table_name natural_join_clause 
    ( K_WHERE expr )?
    ( K_GROUP K_BY expr ( ',' expr )* ( K_HAVING expr )? )?
  ;
