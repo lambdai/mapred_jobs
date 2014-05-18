@@ -43,5 +43,6 @@ public class SQLParser {
 		for(String table: listener.tables) {
 			System.out.println(table);
 		}
+		System.out.println(listener.where);
 	}
 }
