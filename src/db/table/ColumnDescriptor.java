@@ -4,6 +4,8 @@ package db.table;
 public class ColumnDescriptor {
 
 	String columnName;
+	FieldType fieldType;
+	
 	public String getColumnName() {
 		return columnName;
 	}
@@ -19,9 +21,6 @@ public class ColumnDescriptor {
 	public void setFieldType(FieldType fieldType) {
 		this.fieldType = fieldType;
 	}
-
-
-	FieldType fieldType;
 
 	public ColumnDescriptor(String cName, FieldType fType) {
 		columnName = cName;

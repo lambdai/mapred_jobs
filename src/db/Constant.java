@@ -11,4 +11,14 @@ public interface Constant {
 	
 	public static final byte IntTypeId = 1;
 	public static final byte StringTypeId = 2;
+	
+	public static final String GTID = ">";
+	public static final String GEID = ">=";
+
+	public static final String LTID = "<";
+	public static final String LEID = "<=";
+	
+	public static final String EQID = "=";
+	public static final String NEID = "!=";
+	
 }
