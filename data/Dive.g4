@@ -178,6 +178,24 @@ conflict_clause
    )?
  ;
 
+boolexpr
+ : fval predicate_op fval # BoolLeaf
+ |'(' boolexpr ')' # BoolParenthesis
+ | K_NOT boolexpr  # BoolNot
+ | '(' boolexpr ')' K_AND '(' boolexpr ')' # BoolAnd
+ | '(' boolexpr ')' K_OR  '(' boolexpr ')' # BoolOr
+ ;
+
+fval
+ : literal_value # FvalLit
+ | (table_name '.' )? column_name # FvalCol
+ ;
+ 
+predicate_op
+ : ( '<' | '<=' | '>' | '>=' )
+ | ( '=' | '!=' )
+ ;
+
 expr
  : literal_value
  | ( table_name '.' )? column_name
@@ -283,7 +301,7 @@ locals [
 ] 
  : K_SELECT rcol+=result_column ( ',' rcol+=result_column )*
    K_FROM table_name natural_join_clause 
-   ( K_WHERE expr )?
+   ( K_WHERE boolexpr )?
    ( K_GROUP K_BY expr ( ',' expr )* ( K_HAVING expr )? )?
  ;
 
