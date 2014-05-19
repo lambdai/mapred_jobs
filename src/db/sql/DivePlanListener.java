@@ -12,6 +12,8 @@ import db.syntax.DiveParser.Select_coreContext;
 
 public class DivePlanListener extends DiveBaseListener {
 	
+	public List<TableDotColumn> resultColumns = new ArrayList<TableDotColumn>();
+	
 	public List<String> tables = new ArrayList<String>();
 	
 	public BoolExpr where;
