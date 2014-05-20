@@ -1,10 +1,15 @@
 package db.table;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.WritableComparable;
 
 public class Row implements WritableComparable<Row> {
@@ -26,6 +31,21 @@ public class Row implements WritableComparable<Row> {
 		return ret;
 	}
 
+	public void writeToBytes(BytesWritable bytes) throws IOException {
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		DataOutputStream out = new DataOutputStream(bout);
+		write(out);
+		out.flush();
+		byte[] barray = bout.toByteArray();
+		bytes.set(barray, 0, barray.length);
+	}
+	
+	public void readFieldsFromBytes(BytesWritable bytes) throws IOException {
+		DataInput bin = new DataInputStream(new ByteArrayInputStream(bytes.getBytes()));
+		readFields(bin);
+	}
+	
+	
 	@Override
 	public void write(DataOutput out) throws IOException {
 		for (Field f : getFields()) {
