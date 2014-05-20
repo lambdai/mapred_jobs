@@ -16,7 +16,7 @@ public class TestColumnDescriptor extends TestCase {
 	public void testDeserialization() {
 		ColumnDescriptor cd0 = ColumnDescriptor.create("col0,1");
 		assertNotNull(cd0);
-		assertEquals(cd0.columnName, "col0");
-		assertEquals(cd0.fieldType, FieldType.IntType);		
+		assertEquals(cd0.getColumnName(), "col0");
+		assertEquals(cd0.getFieldType(), FieldType.IntType);		
 	}
 }

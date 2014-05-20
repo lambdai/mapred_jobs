@@ -6,6 +6,10 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import db.table.ColumnDescriptor;
+import db.table.FieldType;
+import db.table.Schema;
+
 public class TestSchema extends TestCase {
 	
 	String t1 = "t1";
@@ -17,8 +21,8 @@ public class TestSchema extends TestCase {
 		s.parseAndSetRecordDescriptor(rd1Str);
 		List<ColumnDescriptor> cds = s.getRecordDescriptor();
 		assertEquals(cds.size(), 2);
-		assertEquals(cds.get(1).columnName, "name2");
-		assertEquals(cds.get(1).fieldType, FieldType.StringType);
+		assertEquals(cds.get(1).getColumnName(), "name2");
+		assertEquals(cds.get(1).getFieldType(), FieldType.StringType);
 	}
 	
 }
