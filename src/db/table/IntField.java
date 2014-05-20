@@ -40,8 +40,6 @@ public class IntField implements Field {
 		return FieldType.IntType;
 	}
 	
-	//TODO: hashcode, equals
-	
 	public int hashCode() {
 		return value;
 	}
