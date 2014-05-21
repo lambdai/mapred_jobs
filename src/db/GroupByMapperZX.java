@@ -5,7 +5,7 @@ import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
 import db.table.*;
 
-public class GroupByMapperV1ZX extends Mapper<BytesWritable,BytesWritable,BytesWritable,BytesWritable>{
+public class GroupByMapperZX extends Mapper<BytesWritable,BytesWritable,BytesWritable,BytesWritable>{
 	int[] keyColIndxs;
 	int[] valColIndxs;	// indexes for key and values in output
 	Row row;	//	one row
