@@ -28,6 +28,11 @@ public enum FieldType {
 		public byte getTypeId() {
 			return Constant.IntTypeId;
 		}
+		
+		@Override
+		public Field createInstance() {
+			return new IntField(-1);
+		}
 	},
 	StringType {
 		@Override
@@ -46,12 +51,19 @@ public enum FieldType {
 		public byte getTypeId() {
 			return Constant.StringTypeId;
 		}
+		
+		@Override
+		public Field createInstance() {
+			return new StringField(null);
+		}
 
 	};
 
 	public abstract byte getTypeId();
 
 	public abstract Field parse(DataInput in) throws RowFormatException;
+	
+	public abstract Field createInstance();
 	
 	public static FieldType getFieldTypeById(byte fid) {
 		for(FieldType f : values()) {

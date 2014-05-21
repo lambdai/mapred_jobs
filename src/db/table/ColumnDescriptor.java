@@ -3,8 +3,8 @@ package db.table;
 
 public class ColumnDescriptor {
 
-	String columnName;
-	FieldType fieldType;
+	private String columnName;
+	private FieldType fieldType;
 	
 	public String getColumnName() {
 		return columnName;
@@ -27,7 +27,16 @@ public class ColumnDescriptor {
 		fieldType = fType;
 	}
 	
+	@Override
+	public int hashCode() {
+		return columnName.hashCode() ^ fieldType.getTypeId();		
+	}
+	
+	@Override
 	public boolean equals(Object obj) {
+		if(this == obj) {
+			return true;
+		}
 		if(obj == null || ! (obj instanceof ColumnDescriptor)) {
 			return false;
 		}

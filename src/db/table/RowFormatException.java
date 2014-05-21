@@ -2,7 +2,7 @@ package db.table;
 
 import java.io.IOException;
 
-public class RowFormatException extends Exception {
+public class RowFormatException extends RuntimeException {
 	
 	/**
 	 * 
@@ -10,6 +10,10 @@ public class RowFormatException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	public RowFormatException(IOException ioe) {
-		
+		super(ioe);
+	}
+	
+	public RowFormatException(String cause) {
+		super(cause);
 	}
 }
