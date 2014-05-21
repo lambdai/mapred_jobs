@@ -24,9 +24,15 @@ public class Row /*implements WritableComparable<Row>*/ {
 	public static Row createEmptyRow() {
 		return new Row();
 	}
+	
 	public static Row createBySchema(Schema schema) {
 		Row ret = new Row();
-		ret.schema = schema;
+		ret.initSchema(schema);
+		return ret;
+	}
+	
+	public void initSchema(Schema schema) {
+		this.schema = schema;
 		List<ColumnDescriptor> columnDef = schema.getRecordDescriptor();
 		int nCol = columnDef.size();
 		Field[] fds = new Field[nCol];
@@ -35,8 +41,7 @@ public class Row /*implements WritableComparable<Row>*/ {
 			fds[i] = cd.getFieldType().createInstance();
 			i++;
 		}
-		ret.setFields(fds);
-		return ret;
+		setFields(fds);
 	}
 
 	
