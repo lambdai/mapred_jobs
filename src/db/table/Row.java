@@ -20,6 +20,10 @@ public class Row /*implements WritableComparable<Row>*/ {
 
 	public static final Field fieldMarkRight = new IntField(2);
 
+	
+	public static Row createEmptyRow() {
+		return new Row();
+	}
 	public static Row createBySchema(Schema schema) {
 		Row ret = new Row();
 		ret.schema = schema;
@@ -70,7 +74,7 @@ public class Row /*implements WritableComparable<Row>*/ {
 		byte[] barray = bout.toByteArray();
 		bytes.set(barray, 0, barray.length);
 	}
-	
+
 	public void writeToBytes(BytesWritable bytes) throws IOException {
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		DataOutputStream out = new DataOutputStream(bout);
@@ -79,7 +83,7 @@ public class Row /*implements WritableComparable<Row>*/ {
 		byte[] barray = bout.toByteArray();
 		bytes.set(barray, 0, barray.length);
 	}
-	
+		
 	public void readFieldsFromBytes(BytesWritable bytes) throws IOException {
 		DataInput bin = new DataInputStream(new ByteArrayInputStream(bytes.getBytes()));
 		readFields(bin);
