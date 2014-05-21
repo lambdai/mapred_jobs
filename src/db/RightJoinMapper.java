@@ -23,8 +23,8 @@ BytesWritable tvalue;
 public void setup(Context context) {
 	Configuration conf = context.getConfiguration();
 	String join_using_columns = conf.get(Constant.JOIN_USING);
-	String schema_str = conf.get(Constant.LEFT_JOIN_SCHEMA);
-	Schema schema = new Schema("left");
+	String schema_str = conf.get(Constant.RIGHT_JOIN_SCHEMA);
+	Schema schema = new Schema("right");
 	schema.parseAndSetRecordDescriptor(schema_str);
 	row = Row.createBySchema(schema);
 	keyColumnIndexes = Schema.columnIndexes(schema,
