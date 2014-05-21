@@ -10,18 +10,19 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import db.table.IntField;
 import db.table.JoinRowFactory;
+import db.table.JoinedRow;
 import db.table.Row;
 import db.table.Schema;
+import db.table.SchemaUtils;
 
 public class JoinReducer extends Reducer<BytesWritable, BytesWritable, BytesWritable, BytesWritable> {
-	Row joinedRow;
+	JoinedRow joinedRow;
 	JoinRowFactory factory;
 	Schema leftValueSchema;
 	Schema rightValueSchema;
-	int[] lkeyColumnIndexes;
-	int[] lvalueColumnIndexes;
-	int[] rkeyColumnIndexes;
-	int[] rvalueColumnIndexes;
+	BytesWritable tKey;
+	BytesWritable tValue;
+	
 	public void setup(Context context) {
 		Configuration conf = context.getConfiguration();
 		String join_using_columns = conf.get(Constant.JOIN_USING);
@@ -30,11 +31,16 @@ public class JoinReducer extends Reducer<BytesWritable, BytesWritable, BytesWrit
 		String rSchema = conf.get(Constant.RIGHT_JOIN_SCHEMA);
 		
 		Schema result_schema = new Schema("join_result");
+		Schema leftSchema = new Schema("left");
+		Schema rightSchema = new Schema("right");
+		
 		result_schema.parseAndSetRecordDescriptor(schema_str);
-		joinedRow = Row.createBySchema(result_schema);
+		leftSchema.parseAndSetRecordDescriptor(lSchema);
+		rightSchema.parseAndSetRecordDescriptor(rSchema);
+		joinedRow = JoinedRow.createBySchema(result_schema, leftSchema, rightSchema, join_using_columns);
 		factory = new JoinRowFactory();
-		
-		
+		tKey = Constant.EMPTY_BYTESWRITABLE;
+		tValue = new BytesWritable();
 	}
 	
 	protected void reduce(BytesWritable key, Iterable<BytesWritable> values,
@@ -59,11 +65,13 @@ public class JoinReducer extends Reducer<BytesWritable, BytesWritable, BytesWrit
 		}
 		
 		for(Row left : leftRows) {
+			joinedRow.setCursorOnLeft();
+			joinedRow.push(left);
 			for(Row right:rightRows) {
-				joinedRow.init();
-				joinedRow.push(left);
+				joinedRow.setCursorOnRight();
 				joinedRow.push(right);
-				context.write(null, joinedRow);
+				joinedRow.writeToBytes(tValue);
+				context.write(tKey, tValue);
 			}
 		}
 		

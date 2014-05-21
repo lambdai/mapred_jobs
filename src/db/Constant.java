@@ -1,5 +1,6 @@
 package db;
 
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;
 
 public interface Constant {
@@ -31,5 +32,7 @@ public interface Constant {
 	
 	public static final String EQID = "=";
 	public static final String NEID = "!=";
+	
+	public static final BytesWritable EMPTY_BYTESWRITABLE = new BytesWritable(); 
 	
 }

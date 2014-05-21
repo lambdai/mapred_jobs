@@ -17,8 +17,8 @@ public class LeftJoinMapper extends
 	int[] valueColumnIndexes;
 
 	Row row;
-	BytesWritable tkey;
-	BytesWritable tvalue;
+	BytesWritable tKey;
+	BytesWritable tValue;
 
 	public void setup(Context context) {
 		Configuration conf = context.getConfiguration();
@@ -31,15 +31,17 @@ public class LeftJoinMapper extends
 				SchemaUtils.parseColumns(join_using_columns));
 		valueColumnIndexes = SchemaUtils.columnLeft(keyColumnIndexes, schema
 				.getRecordDescriptor().size());
+		tValue = new BytesWritable();
+		tKey = new BytesWritable();
 	}
 
 	@Override
 	public void map(BytesWritable key, BytesWritable value, Context context)
 			throws IOException, InterruptedException {
 		row.readFieldsFromBytes(value);
-		row.writeToBytes(tkey, keyColumnIndexes);
-		row.writeToBytesWithLeftMark(tvalue, valueColumnIndexes);
-		context.write(tkey, tvalue);
+		row.writeToBytes(tKey, keyColumnIndexes);
+		row.writeToBytesWithLeftMark(tValue, valueColumnIndexes);
+		context.write(tKey, tValue);
 	}
 
 }
