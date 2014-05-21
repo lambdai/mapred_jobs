@@ -11,35 +11,37 @@ import db.table.Schema;
 import db.table.SchemaUtils;
 
 public class RightJoinMapper extends
-	Mapper<BytesWritable, BytesWritable, BytesWritable, BytesWritable> {
+		Mapper<BytesWritable, BytesWritable, BytesWritable, BytesWritable> {
 
-int[] keyColumnIndexes;
-int[] valueColumnIndexes;
+	int[] keyColumnIndexes;
+	int[] valueColumnIndexes;
 
-Row row;
-BytesWritable tkey;
-BytesWritable tvalue;
+	Row row;
+	BytesWritable tKey;
+	BytesWritable tValue;
 
-public void setup(Context context) {
-	Configuration conf = context.getConfiguration();
-	String join_using_columns = conf.get(Constant.JOIN_USING);
-	String schema_str = conf.get(Constant.RIGHT_JOIN_SCHEMA);
-	Schema schema = new Schema("right");
-	schema.parseAndSetRecordDescriptor(schema_str);
-	row = Row.createBySchema(schema);
-	keyColumnIndexes = Schema.columnIndexes(schema,
-			SchemaUtils.parseColumns(join_using_columns));
-	valueColumnIndexes = SchemaUtils.columnLeft(keyColumnIndexes, schema
-			.getRecordDescriptor().size());
-}
+	public void setup(Context context) {
+		Configuration conf = context.getConfiguration();
+		String join_using_columns = conf.get(Constant.JOIN_USING);
+		String schema_str = conf.get(Constant.RIGHT_JOIN_SCHEMA);
+		Schema schema = new Schema("right");
+		schema.parseAndSetRecordDescriptor(schema_str);
+		row = Row.createBySchema(schema);
+		keyColumnIndexes = Schema.columnIndexes(schema,
+				SchemaUtils.parseColumns(join_using_columns));
+		valueColumnIndexes = SchemaUtils.columnLeft(keyColumnIndexes, schema
+				.getRecordDescriptor().size());
+		tValue = new BytesWritable();
+		tKey = new BytesWritable();
+	}
 
-@Override
-public void map(BytesWritable key, BytesWritable value, Context context)
-		throws IOException, InterruptedException {
-	row.readFieldsFromBytes(value);
-	row.writeToBytes(tkey, keyColumnIndexes);
-	row.writeToBytesWithRightMark(tvalue, valueColumnIndexes);
-	context.write(tkey, tvalue);
-}
+	@Override
+	public void map(BytesWritable key, BytesWritable value, Context context)
+			throws IOException, InterruptedException {
+		row.readFieldsFromBytes(value);
+		row.writeToBytes(tKey, keyColumnIndexes);
+		row.writeToBytesWithLeftMark(tValue, valueColumnIndexes);
+		context.write(tKey, tValue);
+	}
 
 }
