@@ -3,7 +3,7 @@ package db.sql;
 import db.table.Field;
 import db.table.IntField;
 
-public class FieldOperand implements PredicateOperand {
+public class FieldOperand implements PredicateOperand, FieldReadable {
 	Field f;
 	
 	

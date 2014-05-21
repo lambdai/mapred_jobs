@@ -1,5 +1,6 @@
 package db.sql;
 
+
 public class OrExpr implements BoolExpr {
 	BoolExpr left;
 	BoolExpr right;
@@ -18,6 +19,29 @@ public class OrExpr implements BoolExpr {
 
 	public void setRight(BoolExpr right) {
 		this.right = right;
+	}
+
+	@Override
+	public Evaluator createEvaluator(EvaluatorFactory factory) {
+		Evaluator l = left.createEvaluator(factory);
+		Evaluator r = right.createEvaluator(factory);
+		CombinedEvaluator eval = new CombinedEvaluator() {
+
+			@Override
+			public boolean evalutate() {
+				for(Evaluator e : getSubEvalutors()) {
+					if(e.evalutate()) {
+						return true;
+					}
+				}
+				return false;
+			}
+			
+		};
+		eval.pushEvalutor(l);
+		eval.pushEvalutor(r);
+		return eval;
+		
 	}
 
 }

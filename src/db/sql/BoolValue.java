@@ -1,5 +1,6 @@
 package db.sql;
 
+
 public class BoolValue implements BoolExpr {
 	
 	PredicateOperand left;
@@ -12,6 +13,8 @@ public class BoolValue implements BoolExpr {
 		this.op = op;
 	}
 	
-	
-
+	@Override
+	public Evaluator createEvaluator(EvaluatorFactory factory) {
+		return factory.create(this);
+	}
 }

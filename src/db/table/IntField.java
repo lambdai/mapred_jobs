@@ -6,16 +6,18 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.IntWritable;
 
+import db.sql.PredicateOp;
+
 public class IntField implements Field {
 	int value;
-	
+
 	public IntField(int val) {
 		value = val;
 	}
 
 	@Override
 	public void write(DataOutput out) throws IOException {
-		new IntWritable(value).write(out);		
+		new IntWritable(value).write(out);
 	}
 
 	@Override
@@ -29,28 +31,57 @@ public class IntField implements Field {
 	public int compareTo(Field o) {
 		byte tid = getFieldType().getTypeId();
 		byte otid = o.getFieldType().getTypeId();
-		if( tid != otid) {
+		if (tid != otid) {
 			return tid - otid;
 		}
-		return value - ((IntField)o).value;
+		return value - ((IntField) o).value;
 	}
 
 	@Override
 	public FieldType getFieldType() {
 		return FieldType.IntType;
 	}
-	
+
 	public int hashCode() {
 		return value;
 	}
 
 	public boolean equals(Object o) {
-		if(this == o) {
+		if (this == o) {
 			return true;
 		}
-		if(o == null || !(o instanceof IntField)) {
+		if (o == null || !(o instanceof IntField)) {
 			return false;
 		}
-		return value == ((IntField)o).value;
+		return value == ((IntField) o).value;
+	}
+
+	@Override
+	public boolean boolOp(Field f, PredicateOp op) {
+		if (f.getFieldType() != getFieldType()) {
+			throw new UnsupportedOperation(String.format(
+					"Wrong arithmatic: (%s %s %s)", op.toString(),
+					this.toString(), f.toString()));
+		}
+		IntField other = (IntField) f;
+		switch (op) {
+		case EQ:
+			return value == other.value;
+		case NEQ:
+			return value != other.value;
+		case GE:
+			return value >= other.value;
+		case GT:
+			return value > other.value;
+		case LE:
+			return value <= other.value;
+		case LT:
+			return value < other.value;
+		
+		default:
+			throw new UnsupportedOperation(String.format(
+					"Wrong arithmatic: (%s %s %s)", op.toString(),
+					this.toString(), f.toString()));
+		}
 	}
 }
