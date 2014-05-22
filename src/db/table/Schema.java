@@ -57,9 +57,10 @@ public class Schema {
 	}
 	
 	public static int[] columnIndexes(Schema schema, List<String> required) {
-		int[] ret = new int[required.size()];
-		List<ColumnDescriptor> rd = schema.recordDescriptor;
-		int rdlen = rd.size();
+		int[] ret = new int[required.size()]; //group by key word
+		List<ColumnDescriptor> rd = schema.recordDescriptor; //getRecordDescriptor()?
+		int rdlen = rd.size(); // whole schema length
+		// search the group by key word and store into ret array
 		nextSearch:
 		for(int i = 0; i < ret.length; i++) {
 			String current = required.get(i);
@@ -72,7 +73,8 @@ public class Schema {
 			}
 			throw new RowFormatException("no such column: " + current);
 		}
-		return ret;
+
+		return ret; // return the array with group by key words
 	}
 	
 	public static List<ColumnDescriptor> equiCols(Schema schema1, Schema schema2) {

@@ -77,6 +77,7 @@ public class Row /*implements WritableComparable<Row>*/ {
 		}
 		out.flush();
 		byte[] barray = bout.toByteArray();
+	    // Create a BytesWritable using the byte array as the initial value and length as the length.
 		bytes.set(barray, 0, barray.length);
 	}
 
@@ -90,8 +91,9 @@ public class Row /*implements WritableComparable<Row>*/ {
 	}
 		
 	public void readFieldsFromBytes(BytesWritable bytes) throws IOException {
+		// convert paramater into the byte stream
 		DataInput bin = new DataInputStream(new ByteArrayInputStream(bytes.getBytes()));
-		readFields(bin);
+		readFields(bin); // read in these byte steam
 	}
 	
 	public void write(DataOutput out) throws IOException {
