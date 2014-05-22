@@ -10,6 +10,8 @@ import org.apache.hadoop.io.BytesWritable;
 public class JoinRowFactory {
 	IntField markField;
 	DataInput in;
+
+	// convert bytes stream to field
 	public IntField readOneFieldFromBytes(BytesWritable bytes) throws IOException {
 		in = new DataInputStream(new ByteArrayInputStream(bytes.getBytes()));
 		markField.readFields(in);

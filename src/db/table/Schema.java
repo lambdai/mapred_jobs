@@ -28,8 +28,10 @@ public class Schema {
 		this.tableName = tableName;
 	}
 	
+	
+	//convert a schema into local ArrayList (recordDescriptor)
 	public void parseAndSetRecordDescriptor (String desc) {
-		String[] columnMetas = desc.split(Constant.COLUMN_SPLIT);
+		String[] columnMetas = desc.split(Constant.COLUMN_SPLIT); // split by ;
 		recordDescriptor = new ArrayList<ColumnDescriptor>();
 		for(String columnMeta : columnMetas) {
 			recordDescriptor.add(ColumnDescriptor.create(columnMeta));

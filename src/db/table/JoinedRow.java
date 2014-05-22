@@ -22,6 +22,8 @@ public class JoinedRow extends Row {
 		ret.initSchema(schema);
 		List<String> keyList = SchemaUtils.parseColumns(join_using_columns);
 		ret.nColForJoinKey = keyList.size();
+
+		// delete those repeating row?
 		ret.nLeftColumnRemained = left.getRecordDescriptor().size()
 				- ret.nColForJoinKey;
 		ret.nRightColumnRemained = right.getRecordDescriptor().size()
@@ -33,6 +35,8 @@ public class JoinedRow extends Row {
 		Field[] fds = getFields();
 		DataInput bin = new DataInputStream(new ByteArrayInputStream(
 				key.getBytes()));
+
+		// read the byte stream into field
 		for (int i = 0; i < nColForJoinKey; i++) {
 			fds[i].readFields(bin);
 		}

@@ -22,6 +22,7 @@ public class ColumnDescriptor {
 		this.fieldType = fieldType;
 	}
 
+	// constructor
 	public ColumnDescriptor(String cName, FieldType fType) {
 		columnName = cName;
 		fieldType = fType;
@@ -51,8 +52,9 @@ public class ColumnDescriptor {
 	
 	public static ColumnDescriptor create(String s) {
 		String[] tmp = s.split(",");
+		// should read FieldType.java. 1st return the columnName, 2nd return FieldType with a certain fid(tmp[1])
 		ColumnDescriptor cd = new ColumnDescriptor(tmp[0], FieldType.getFieldTypeById(Byte.parseByte(tmp[1])));
-		return cd;
+		return cd; // return this instance
 	}
 	
 	
