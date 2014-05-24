@@ -187,4 +187,7 @@ public class Row /*implements WritableComparable<Row>*/ {
 		this.schema = schema;
 	}
 	
+	public void setField(Field fd, int index){	//added by ZX, mod/rmv if needed
+		fields[index]=fd;
+	}
 }
