@@ -84,4 +84,8 @@ public class IntField implements Field {
 					this.toString(), f.toString()));
 		}
 	}
+	
+	public String toString() {
+		return "{" + this.getClass().getCanonicalName() + " " + value + "}"; 
+	}
 }

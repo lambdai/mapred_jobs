@@ -1,5 +1,7 @@
 package db.sql;
 
+import db.Constant;
+
 
 public class AndExpr implements BoolExpr {
 	BoolExpr left;
@@ -44,6 +46,16 @@ public class AndExpr implements BoolExpr {
 		
 	}
 
+	public String toString() {
+		return "{" + Constant.AND_EXPR + " " + left.toString() + " " + right.toString() + "}";
+	}
 	
+	public int parseFieldsFromString(String str, int start, int end) {
+		WhereParser p = new WhereParser(str, start, end);
+		left = p.parseBoolExpr();  	// the cursor should be the right parenthesis of {1stExpr args..}
+		p.incCurrent();				// skip the space between left and right;
+		right = p.parseBoolExpr(); 	// the cursor should be the right parenthesis of {2ndExpr args..}
+		return p.incCurrent(); 	// the cursor should be the right parenthesis of {AndExpr left right}
+	}
 
 }

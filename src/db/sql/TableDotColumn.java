@@ -29,4 +29,11 @@ public class TableDotColumn implements PredicateOperand {
 		this.columnName = column;
 	}
 	
+	public String toString() {
+		if(tableName != null) {
+			return "{" + tableName + "." + columnName + "}" ;
+		} else {
+			return "{" + columnName + "}";
+		}
+	}
 }

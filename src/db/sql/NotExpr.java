@@ -1,5 +1,7 @@
 package db.sql;
 
+import db.Constant;
+
 
 public class NotExpr implements BoolExpr {
 	BoolExpr child;
@@ -27,5 +29,13 @@ public class NotExpr implements BoolExpr {
 		return eval;
 	}
 
+	public String toString() {
+		return "{" + Constant.NOT_EXPR + " " + child.toString() + "}";
+	}
 	
+	public int parseFieldsFromString(String str, int start, int end) {
+		WhereParser p = new WhereParser(str, start, end);
+		child = p.parseBoolExpr();
+		return p.getCurrent() + 1; // the cursor should be the right parenthesis of {Not child}
+	}
 }

@@ -63,4 +63,8 @@ public class StringField implements Field {
 				"Wrong arithmatic: (%s %s %s)", op.toString(),
 				this.toString(), f.toString()));
 	}
+	
+	public String toString() {
+		return "{" + this.getClass().getCanonicalName() + " " + str + "}"; 
+	}
 }

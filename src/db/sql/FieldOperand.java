@@ -27,5 +27,9 @@ public class FieldOperand implements PredicateOperand, FieldReadable {
 		this.f = f;
 	}
 	
+	public String toString() {
+		return "{" + f.toString() + "}";
+	}
+	
 	
 }
