@@ -5,11 +5,13 @@ import org.apache.hadoop.io.Text;
 
 public interface Constant {
 
-	final public String AGG_COLUMN_ID = "agg_column_id";
+	final public String AGG_COLUMN_IDS = "agg_column_ids";
 	final public String COLUMN_ID = "column_id";
 	final public String DEST_VALUE = "dest_value";
 	
 	//for schema
+	public final String INPUT_TABLE_SCHEMA = "input_table_schema";	
+	final public String OUTPUT_TABLE_SCHEMA = "output_table_schema";
 	final public String COLUMN_SPLIT = ";";
 	final public String COLUMN_NAME_TYPE_SPLIT = ",";
 	
@@ -18,6 +20,8 @@ public interface Constant {
 	final public String LEFT_JOIN_SCHEMA = "left_join_schema";
 	final public String RIGHT_JOIN_SCHEMA = "right_join_schema";
 	final public String JOIN_RESULT_SCHEMA = "result_join_schema";
+	
+	
 	
 	final public Text EMPTY_TEXT= new Text("");
 	public final String AND_EXPR = "AND";
