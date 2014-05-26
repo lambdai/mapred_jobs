@@ -5,7 +5,7 @@ import org.apache.hadoop.io.Text;
 
 public interface Constant {
 
-	final public String AGG_COLUMN_IDS = "agg_column_ids";
+	final public String AGG_COLUMNS = "agg_columns";
 	final public String COLUMN_ID = "column_id";
 	final public String DEST_VALUE = "dest_value";
 	
