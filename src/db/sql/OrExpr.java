@@ -53,7 +53,8 @@ public class OrExpr implements BoolExpr {
 	public int parseFieldsFromString(String str, int start, int end) {
 		WhereParser p = new WhereParser(str, start, end);
 		left = p.parseBoolExpr();
+		p.incCurrent();
 		right = p.parseBoolExpr();
-		return p.getCurrent() + 1; // the cursor should be the right parenthesis of {OrExpr left right}
+		return p.getCurrent(); // the cursor should be the right parenthesis of {OrExpr left right}
 	}
 }

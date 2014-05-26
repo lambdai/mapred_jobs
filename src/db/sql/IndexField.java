@@ -1,6 +1,7 @@
 package db.sql;
 
 import db.table.Field;
+import db.table.RowFormatException;
 
 public class IndexField implements PredicateOperand, FieldReadable {
 
@@ -27,6 +28,12 @@ public class IndexField implements PredicateOperand, FieldReadable {
 
 	public void setClosure(RowEvaluationClosure closure) {
 		this.closure = closure;
+	}
+
+
+	@Override
+	public int parseFieldsFromString(String str, int start, int end) {
+		throw new RowFormatException(str);
 	}
 
 	

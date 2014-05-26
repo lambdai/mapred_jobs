@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.apache.hadoop.io.IntWritable;
 
 import db.sql.PredicateOp;
+import db.sql.WhereParser;
 
 public class IntField implements Field {
 	int value;
@@ -86,6 +87,13 @@ public class IntField implements Field {
 	}
 	
 	public String toString() {
-		return "{" + this.getClass().getCanonicalName() + " " + value + "}"; 
+		return "{" + this.getClass().getSimpleName() + " " + value + "}"; 
+	}
+
+	@Override
+	public int parseFieldsFromString(String str, int start, int end) {
+		int inext = str.indexOf("}", start);
+		value = Integer.valueOf(str.substring(start, inext));
+		return inext;
 	}
 }

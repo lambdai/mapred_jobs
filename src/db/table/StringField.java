@@ -65,6 +65,12 @@ public class StringField implements Field {
 	}
 	
 	public String toString() {
-		return "{" + this.getClass().getCanonicalName() + " " + str + "}"; 
+		return "{" + this.getClass().getSimpleName() + " " + str.length() + " " + str + "}"; 
+	}
+
+	@Override
+	//TODO
+	public int parseFieldsFromString(String str, int start, int end) {
+		throw new RowFormatException(str);
 	}
 }

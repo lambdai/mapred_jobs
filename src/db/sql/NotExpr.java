@@ -6,6 +6,13 @@ import db.Constant;
 public class NotExpr implements BoolExpr {
 	BoolExpr child;
 
+	public NotExpr(BoolExpr expr) {
+		this.child = expr;
+	}
+
+	public NotExpr() {
+	}
+
 	public BoolExpr getChild() {
 		return child;
 	}
@@ -36,6 +43,6 @@ public class NotExpr implements BoolExpr {
 	public int parseFieldsFromString(String str, int start, int end) {
 		WhereParser p = new WhereParser(str, start, end);
 		child = p.parseBoolExpr();
-		return p.getCurrent() + 1; // the cursor should be the right parenthesis of {Not child}
+		return p.getCurrent(); // the cursor should be the right parenthesis of {Not child}
 	}
 }

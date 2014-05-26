@@ -31,8 +31,10 @@ public class BoolValue implements BoolExpr {
 	public int parseFieldsFromString(String str, int start, int end) {
 		WhereParser p = new WhereParser(str, start, end);
 		op = p.parsePredicateOp();
+		p.incCurrent();
 		left = p.parsePredicateOpereand();
+		p.incCurrent();
 		right = p.parsePredicateOpereand();
-		return p.getCurrent() + 1; // the cursor should be the right parenthesis of {BVAL op left right}
+		return p.getCurrent(); // the cursor should be the right parenthesis of {BVAL op left right}
 	}
 }

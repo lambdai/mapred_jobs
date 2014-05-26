@@ -45,4 +45,10 @@ public enum PredicateOp {
 		throw new UnsupportedOperationException(String.format(
 				"Wrong PredicateOp: %s", str));
 	}
+	
+	public String toString() {
+		return getStringId();
+	}
+	
+	
 }

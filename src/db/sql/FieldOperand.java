@@ -28,7 +28,13 @@ public class FieldOperand implements PredicateOperand, FieldReadable {
 	}
 	
 	public String toString() {
-		return "{" + f.toString() + "}";
+		return "{" + getClass().getSimpleName() + " " + f.toString() + "}";
+	}
+	
+	public int parseFieldsFromString(String str, int start, int end) {
+		WhereParser p = new WhereParser(str, start, end);
+		f = p.parseField();
+		return p.getCurrent();
 	}
 	
 	

@@ -1,7 +1,10 @@
 package db.sql;
 
 import db.Constant;
+import db.table.Field;
+import db.table.IntField;
 import db.table.RowFormatException;
+import db.table.StringField;
 
 public class WhereParser {
 
@@ -25,10 +28,11 @@ public class WhereParser {
 
 	public BoolExpr parseBoolExpr() {
 		int inext;
-		assert (str.charAt(icurrent) == '{');
+//		assert (str.charAt(icurrent) == '{');
+//		System.out.println(str.substring(icurrent,72));
 		icurrent++;
 		inext = str.indexOf(" ", icurrent);
-		//TODO: 2nd argument is length or offset
+		//DONE: 2nd argument is offset from the beginning of the original string(excluded)
 		String func = str.substring(icurrent, inext);
 		BoolExpr ret = null;
 		if (func.equals(Constant.AND_EXPR)) {
@@ -47,9 +51,6 @@ public class WhereParser {
 		throw new RowFormatException(str);
 	}
 
-	public BoolValue parseBoolValue(String str, int start, int end) {
-		return null;
-	}
 
 	public int findMatchParenthesis(int start) {
 		int nOpen = 0;
@@ -70,12 +71,48 @@ public class WhereParser {
 	}
 
 	public PredicateOp parsePredicateOp() {
-		// TODO Auto-generated method stub
-		throw new RowFormatException(str);
+		int inext = str.indexOf(" ", icurrent);
+		String opstr = str.substring(icurrent, inext);
+		PredicateOp op = PredicateOp.getByString(opstr);
+		icurrent = inext;
+		return op;
 	}
 
 	public PredicateOperand parsePredicateOpereand() {
-		// TODO Auto-generated method stub
+		int inext;
+		assert (str.charAt(icurrent) == '{');
+		icurrent++;
+		inext = str.indexOf(" ", icurrent);
+		String func = str.substring(icurrent, inext);
+		PredicateOperand ret = null;
+		if (func.equals(TableDotColumn.class.getSimpleName())) {
+			ret = new TableDotColumn();
+		} else if (func.equals(FieldOperand.class.getSimpleName())) {
+			ret = FieldOperand.create("0");
+		}
+		if(ret != null) {
+			icurrent = ret.parseFieldsFromString(str, inext+1, end) + 1;	//inext is the offset following the SPACE 
+			return ret;
+		}
+		throw new RowFormatException(str);
+	}
+
+	public Field parseField() {
+		int inext;
+		assert (str.charAt(icurrent) == '{');
+		icurrent++;
+		inext = str.indexOf(" ", icurrent);
+		String func = str.substring(icurrent, inext);
+		Field ret = null;
+		if (func.equals(IntField.class.getSimpleName())) {
+			ret = new IntField(0);
+		} else if (func.equals(FieldOperand.class.getSimpleName())) {
+			ret = new StringField("");
+		}
+		if(ret != null) {
+			icurrent = ret.parseFieldsFromString(str, inext+1, end) + 1;	//inext is the offset following the SPACE 
+			return ret;
+		}
 		throw new RowFormatException(str);
 	}
 

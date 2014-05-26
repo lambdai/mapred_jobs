@@ -55,7 +55,7 @@ public class AndExpr implements BoolExpr {
 		left = p.parseBoolExpr();  	// the cursor should be the right parenthesis of {1stExpr args..}
 		p.incCurrent();				// skip the space between left and right;
 		right = p.parseBoolExpr(); 	// the cursor should be the right parenthesis of {2ndExpr args..}
-		return p.incCurrent(); 	// the cursor should be the right parenthesis of {AndExpr left right}
+		return p.getCurrent(); 	// the cursor should be the right parenthesis of {AndExpr left right}
 	}
 
 }
