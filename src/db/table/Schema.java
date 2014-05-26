@@ -3,6 +3,8 @@ package db.table;
 import java.util.ArrayList;
 import java.util.List;
 
+import db.Constant;
+
 public class Schema {
 	
 	private String tableName;
@@ -26,8 +28,10 @@ public class Schema {
 		this.tableName = tableName;
 	}
 	
+	
+	//convert a schema into local ArrayList (recordDescriptor)
 	public void parseAndSetRecordDescriptor (String desc) {
-		String[] columnMetas = desc.split(";");
+		String[] columnMetas = desc.split(Constant.COLUMN_SPLIT); // split by ;
 		recordDescriptor = new ArrayList<ColumnDescriptor>();
 		for(String columnMeta : columnMetas) {
 			recordDescriptor.add(ColumnDescriptor.create(columnMeta));
@@ -54,21 +58,62 @@ public class Schema {
 		return tableName + " " + dumpRecordDescriptor();
 	}
 	
+	public static int[] columnIndexes(Schema schema, List<String> required) {
+		int[] ret = new int[required.size()]; //group by key word
+		List<ColumnDescriptor> rd = schema.recordDescriptor; //getRecordDescriptor()?
+		int rdlen = rd.size(); // whole schema length
+		// search the group by key word and store into ret array
+		nextSearch:
+		for(int i = 0; i < ret.length; i++) {
+			String current = required.get(i);
+			for(int j = 0; j < rdlen; j++) {
+				if(rd.get(j).getColumnName().equals(current)) {
+					ret[i] = j;
+					i++;
+					continue nextSearch;
+				}
+			}
+			throw new RowFormatException("no such column: " + current);
+		}
+
+		return ret; // return the array with group by key words
+	}
+	
+	public static List<ColumnDescriptor> equiCols(Schema schema1, Schema schema2) {
+		List<ColumnDescriptor> equiCols = new ArrayList<ColumnDescriptor>();
+		for(ColumnDescriptor cd: schema1.recordDescriptor) {
+			if(schema2.recordDescriptor.contains(cd)) {
+				equiCols.add(cd);
+			}
+		}
+		return equiCols;
+	}
+	
+	public static Schema natualJoin(Schema schema1, Schema schema2) {
+		return natualJoin(schema1, schema2, equiCols(schema1, schema2));
+	}
 	
 	public static Schema natualJoin(Schema schema1, Schema schema2, List<ColumnDescriptor> on) throws UnsupportedOperationException {
 		Schema ret = new Schema("natualjoin");
 		if(!schema1.isValid() || schema2.isValid() ) {
 			throw(new UnsupportedOperationException("invalid Schema"));
 		}
+		
 		List<ColumnDescriptor> tmpList = new ArrayList<ColumnDescriptor>();
-		tmpList.addAll(schema1.recordDescriptor);
-		for(ColumnDescriptor cd2 : schema2.recordDescriptor) {
-			if (!ret.recordDescriptor.contains(cd2)) {
-				tmpList.add(cd2);
-			} else {
-				on.add(cd2);
+		tmpList.addAll(on);
+		
+		for(ColumnDescriptor cd1 : schema1.recordDescriptor) {
+			if (!on.contains(cd1)) {
+				tmpList.add(cd1);
 			}
 		}
+		
+		for(ColumnDescriptor cd2 : schema2.recordDescriptor) {
+			if (!on.contains(cd2)) {
+				tmpList.add(cd2);
+			}
+		}
+		
 		ret.setRecordDescriptor(tmpList);
 		return ret;
 	}

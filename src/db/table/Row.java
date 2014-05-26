@@ -12,13 +12,27 @@ import java.util.List;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.WritableComparable;
 
-public class Row implements WritableComparable<Row> {
+public class Row /*implements WritableComparable<Row>*/ {
 	private Field[] fields;
 	private Schema schema;
 
+	public static final Field fieldMarkLeft = new IntField(1); 
+
+	public static final Field fieldMarkRight = new IntField(2);
+
+	
+	public static Row createEmptyRow() {
+		return new Row();
+	}
+	
 	public static Row createBySchema(Schema schema) {
 		Row ret = new Row();
-		ret.schema = schema;
+		ret.initSchema(schema);
+		return ret;
+	}
+	
+	public void initSchema(Schema schema) {
+		this.schema = schema;
 		List<ColumnDescriptor> columnDef = schema.getRecordDescriptor();
 		int nCol = columnDef.size();
 		Field[] fds = new Field[nCol];
@@ -27,8 +41,44 @@ public class Row implements WritableComparable<Row> {
 			fds[i] = cd.getFieldType().createInstance();
 			i++;
 		}
-		ret.setFields(fds);
-		return ret;
+		setFields(fds);
+	}
+
+	
+	public void writeToBytesWithLeftMark(BytesWritable bytes, int[] iColumns) throws IOException {
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		DataOutputStream out = new DataOutputStream(bout);
+		fieldMarkLeft.write(out);
+		for(int i: iColumns) {
+			fields[i].write(out);
+		}
+		out.flush();
+		byte[] barray = bout.toByteArray();
+		bytes.set(barray, 0, barray.length);
+	}
+
+	public void writeToBytesWithRightMark(BytesWritable bytes, int[] iColumns) throws IOException {
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		DataOutputStream out = new DataOutputStream(bout);
+		fieldMarkRight.write(out);
+		for(int i: iColumns) {
+			fields[i].write(out);
+		}
+		out.flush();
+		byte[] barray = bout.toByteArray();
+		bytes.set(barray, 0, barray.length);
+	}
+	
+	public void writeToBytes(BytesWritable bytes, int[] iColumns) throws IOException {
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		DataOutputStream out = new DataOutputStream(bout);
+		for(int i: iColumns) {
+			fields[i].write(out);
+		}
+		out.flush();
+		byte[] barray = bout.toByteArray();
+	    // Create a BytesWritable using the byte array as the initial value and length as the length.
+		bytes.set(barray, 0, barray.length);
 	}
 
 	public void writeToBytes(BytesWritable bytes) throws IOException {
@@ -39,21 +89,20 @@ public class Row implements WritableComparable<Row> {
 		byte[] barray = bout.toByteArray();
 		bytes.set(barray, 0, barray.length);
 	}
-	
+		
 	public void readFieldsFromBytes(BytesWritable bytes) throws IOException {
+		// convert paramater into the byte stream
 		DataInput bin = new DataInputStream(new ByteArrayInputStream(bytes.getBytes()));
-		readFields(bin);
+		readFields(bin); // read in these byte steam
 	}
 	
-	
-	@Override
 	public void write(DataOutput out) throws IOException {
 		for (Field f : getFields()) {
 			f.write(out);
 		}
 	}
-
-	@Override
+	
+	
 	public void readFields(DataInput in) throws IOException {
 		if (getFields() == null) {
 			throw new UnsupportedOperation(
@@ -64,6 +113,7 @@ public class Row implements WritableComparable<Row> {
 		}
 	}
 
+	/*
 	@Override
 	//TODO: do not compare by length first
 	public int compareTo(Row other) {
@@ -120,7 +170,7 @@ public class Row implements WritableComparable<Row> {
 		}
 		return ret;
 	}
-
+*/
 	public void setFields(Field[] fields) {
 		this.fields = fields;
 	}
@@ -129,4 +179,15 @@ public class Row implements WritableComparable<Row> {
 		return fields;
 	}
 
+	public Schema getSchema() {
+		return schema;
+	}
+
+	public void setSchema(Schema schema) {
+		this.schema = schema;
+	}
+	
+	public void setField(Field fd, int index){	//added by ZX, mod/rmv if needed
+		fields[index]=fd;
+	}
 }
