@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.Text;
 
+import db.sql.PredicateOp;
+
 public class StringField implements Field {
 	String str;
 
@@ -53,5 +55,22 @@ public class StringField implements Field {
 			return false;
 		}
 		return str == ((StringField) o).str;
+	}
+
+	@Override
+	public boolean boolOp(Field f, PredicateOp op) throws UnsupportedOperation {
+		throw new UnsupportedOperation(String.format(
+				"Wrong arithmatic: (%s %s %s)", op.toString(),
+				this.toString(), f.toString()));
+	}
+	
+	public String toString() {
+		return "{" + this.getClass().getSimpleName() + " " + str.length() + " " + str + "}"; 
+	}
+
+	@Override
+	//TODO
+	public int parseFieldsFromString(String str, int start, int end) {
+		throw new RowFormatException(str);
 	}
 }

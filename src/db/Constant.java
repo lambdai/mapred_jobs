@@ -20,6 +20,11 @@ public interface Constant {
 	final public String JOIN_RESULT_SCHEMA = "result_join_schema";
 	
 	final public Text EMPTY_TEXT= new Text("");
+	public final String AND_EXPR = "AND";
+	public final String OR_EXPR = "OR";
+	public final String NOT_EXPR = "NOT";
+	public final String BOOL_VALUE_EXPR = "BVAL";
+	
 	
 	public static final byte IntTypeId = 1;
 	public static final byte StringTypeId = 2;
