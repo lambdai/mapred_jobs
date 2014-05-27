@@ -38,7 +38,7 @@ public class Row /*implements WritableComparable<Row>*/ {
 		Field[] fds = new Field[nCol];
 		int i = 0;
 		for (ColumnDescriptor cd : columnDef) {
-			fds[i] = cd.getFieldType().createInstance();
+			fds[i] = cd.getOutputFieldType().createInstance();
 			i++;
 		}
 		setFields(fds);

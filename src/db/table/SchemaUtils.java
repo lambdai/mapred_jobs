@@ -8,7 +8,7 @@ import db.Constant;
 public class SchemaUtils {
 
 	public static List<String> parseColumns(String str) {
-		List<String> list = Arrays.asList(str.split(Constant.COLUMN_SPLIT)); //by ;
+		List<String> list = Arrays.asList(str.split(Constant.COLUMN_SPLIT));
 		return list;
 	}
 	
@@ -34,13 +34,6 @@ public class SchemaUtils {
 			ret[offset++] = i; // store the left key word such as salary
 		}
 		return ret;
-	}
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

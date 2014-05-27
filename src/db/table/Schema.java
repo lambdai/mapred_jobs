@@ -31,10 +31,10 @@ public class Schema {
 	
 	//convert a schema into local ArrayList (recordDescriptor)
 	public void parseAndSetRecordDescriptor (String desc) {
-		String[] columnMetas = desc.split(Constant.COLUMN_SPLIT); // split by ;
+		String[] columnMetas = desc.split(Constant.COLUMN_SPLIT);
 		recordDescriptor = new ArrayList<ColumnDescriptor>();
 		for(String columnMeta : columnMetas) {
-			recordDescriptor.add(ColumnDescriptor.create(columnMeta));
+			recordDescriptor.add(ColumnDescUtils.createCD(columnMeta));
 		}
 	}
 	
@@ -87,6 +87,16 @@ public class Schema {
 			}
 		}
 		return equiCols;
+	}
+	
+	public Schema createSubSchema(int[] subset) {
+		Schema ret = new Schema("tmp");
+		List<ColumnDescriptor> cds = new ArrayList<ColumnDescriptor>(subset.length);
+		for(int i = 0; i < subset.length; i++) {
+			cds.add(recordDescriptor.get(subset[i]));
+		}
+		ret.setRecordDescriptor(cds);
+		return ret;
 	}
 	
 	public static Schema natualJoin(Schema schema1, Schema schema2) {

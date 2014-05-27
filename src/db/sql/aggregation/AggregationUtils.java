@@ -21,6 +21,8 @@ public class AggregationUtils {
 	public static synchronized AggregationFunction createFunctionInstance(String fName) {
 		AggregationFunction ret;
 		try {
+			System.out.println(fName);
+			System.out.println(get(fName).getSimpleName());
 			ret = (AggregationFunction) get(fName).getConstructor().newInstance();
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
@@ -30,6 +32,16 @@ public class AggregationUtils {
 		return ret;
 	}
 	
-	
+	static {
+		try {
+			Class.forName("db.sql.aggregation.Sum");
+			Class.forName("db.sql.aggregation.Average");
+			Class.forName("db.sql.aggregation.Max");
+			Class.forName("db.sql.aggregation.Min");
+			Class.forName("db.sql.aggregation.Count");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
