@@ -9,5 +9,7 @@ public interface AggregationFunction {
 	public abstract void accept(Field f);
 	
 	public abstract Field submit();
+	
+	public String getFunctionName();
 
 }

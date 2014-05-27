@@ -5,6 +5,8 @@ import db.table.IntField;
 
 public class Max implements AggregationFunction {
 
+	public final static String functionName = "MAX";
+	
 	private int max;
 	@Override
 	public void init() {
@@ -20,6 +22,15 @@ public class Max implements AggregationFunction {
 	@Override
 	public Field submit() {
 		return new IntField(max);
+	}
+
+	@Override
+	public String getFunctionName() {
+		return  functionName;
+	}
+	
+	static {
+		AggregationUtils.put(functionName, Max.class);
 	}
 
 }

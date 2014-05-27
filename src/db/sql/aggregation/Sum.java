@@ -5,6 +5,7 @@ import db.table.IntField;
 
 public class Sum implements AggregationFunction {
 
+	public final static String functionName = "SUM";
 	private int sum;
 	@Override
 	public void init() {
@@ -22,4 +23,12 @@ public class Sum implements AggregationFunction {
 		return new IntField(sum);
 	}
 
+	@Override
+	public String getFunctionName() {
+		return  functionName;
+	}
+	
+	static {
+		AggregationUtils.put(functionName, Sum.class);
+	}
 }

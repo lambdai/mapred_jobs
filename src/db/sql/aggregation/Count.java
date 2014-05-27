@@ -5,6 +5,8 @@ import db.table.IntField;
 
 public class Count implements AggregationFunction {
 
+	public final static String functionName = "COUNT";
+	
 	private int count;
 	@Override
 	public void init() {
@@ -21,4 +23,12 @@ public class Count implements AggregationFunction {
 		return new IntField(count);
 	}
 
+	@Override
+	public String getFunctionName() {
+		return  functionName;
+	}
+	
+	static {
+		AggregationUtils.put(functionName, Count.class);
+	}
 }
