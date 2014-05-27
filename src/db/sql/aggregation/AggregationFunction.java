@@ -1,6 +1,7 @@
 package db.sql.aggregation;
 
 import db.table.Field;
+import db.table.FieldType;
 
 public interface AggregationFunction {
 	
@@ -12,4 +13,6 @@ public interface AggregationFunction {
 	
 	public String getFunctionName();
 
+	public FieldType outputFieldType();
+	
 }

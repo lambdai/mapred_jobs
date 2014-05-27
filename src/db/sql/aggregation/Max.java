@@ -1,6 +1,7 @@
 package db.sql.aggregation;
 
 import db.table.Field;
+import db.table.FieldType;
 import db.table.IntField;
 
 public class Max implements AggregationFunction {
@@ -27,6 +28,11 @@ public class Max implements AggregationFunction {
 	@Override
 	public String getFunctionName() {
 		return  functionName;
+	}
+	
+	@Override
+	public FieldType outputFieldType() {
+		return FieldType.IntType;
 	}
 	
 	static {

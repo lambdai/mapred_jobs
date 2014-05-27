@@ -1,6 +1,7 @@
 package db.sql.aggregation;
 
 import db.table.Field;
+import db.table.FieldType;
 import db.table.IntField;
 
 public class Sum implements AggregationFunction {
@@ -26,6 +27,11 @@ public class Sum implements AggregationFunction {
 	@Override
 	public String getFunctionName() {
 		return  functionName;
+	}
+	
+	@Override
+	public FieldType outputFieldType() {
+		return FieldType.IntType;
 	}
 	
 	static {
