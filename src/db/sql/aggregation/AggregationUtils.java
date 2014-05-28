@@ -1,6 +1,5 @@
 package db.sql.aggregation;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,9 +23,7 @@ public class AggregationUtils {
 			System.out.println(fName);
 			System.out.println(get(fName).getSimpleName());
 			ret = (AggregationFunction) get(fName).getConstructor().newInstance();
-		} catch (InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
+		} catch (Exception e) {
 			throw new RowFormatException(fName);
 		}
 		return ret;
