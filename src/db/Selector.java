@@ -1,8 +1,7 @@
 package db;
-import db.table.Field;
 import db.table.Row;
-import db.table.SchemaUtils;
 import db.table.Schema;
+import db.table.SchemaUtils;
 
 public class Selector {
 	private int[] colIndexes;
