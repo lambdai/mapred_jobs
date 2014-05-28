@@ -1,1 +1,1 @@
-select * from t1 natural join t2 where (t1.col1 = 1) and (t2.col2 = t1.col3);
+select b, AVG(a), SUM(c) from R natural join S where (a = 1) and (b > c) group by b;

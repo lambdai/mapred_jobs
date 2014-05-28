@@ -5,23 +5,32 @@ import java.util.List;
 
 import org.antlr.v4.runtime.misc.NotNull;
 
+import db.Dive;
 import db.syntax.DiveBaseListener;
 import db.syntax.DiveParser;
 import db.syntax.DiveParser.Natural_join_clauseContext;
 import db.syntax.DiveParser.Select_coreContext;
+import db.table.AggFuncColumnDescriptor;
+import db.table.ColumnDescriptor;
+import db.table.FieldType;
+import db.table.SimpleColumnDescriptor;
 
 public class DivePlanListener extends DiveBaseListener {
 	
-	public List<TableDotColumn> resultColumns = new ArrayList<TableDotColumn>();
-	
-	public List<String> tables = new ArrayList<String>();
-	
+	public List<ColumnDescriptor> resultColumns = new ArrayList<ColumnDescriptor>();
+	public List<ColumnDescriptor> groupbyColumns = new ArrayList<ColumnDescriptor>();
+	public List<String> joinTables = new ArrayList<String>();
 	public BoolExpr where;
 	
 	private BoolExprFactory bf = new BoolExprFactory();
 	
 	private PredicateExprFactory pf = new PredicateExprFactory();
 	
+	private Dive dive;
+	
+	public DivePlanListener(Dive dive) {
+		this.dive = dive;
+	}
 	/*
 	@Override
 	public void enterTable_name(@NotNull DiveParser.Table_nameContext ctx){
@@ -33,18 +42,30 @@ public class DivePlanListener extends DiveBaseListener {
 		System.out.println(ctx.getText());
 	}
 	*/
+	public void initSelect() {
+		resultColumns = new ArrayList<ColumnDescriptor>();
+		groupbyColumns = new ArrayList<ColumnDescriptor>();
+		joinTables = new ArrayList<String>();
+		where = null;
+		bf = new BoolExprFactory();
+		pf = new PredicateExprFactory();
+	}
 	
+	public void enterSelect_core(@NotNull DiveParser.Select_coreContext ctx) {
+		initSelect();
+	}	
 	@Override
 	public void exitSelect_core(@NotNull DiveParser.Select_coreContext ctx) {
 		where = bf.stack.pop();
+		dive.createSelectJob(resultColumns, groupbyColumns, joinTables, where);
 	}
 	
 	@Override
 	public void exitTable_name(@NotNull DiveParser.Table_nameContext ctx){
 		if(ctx.parent instanceof Select_coreContext) {
-			tables.add(ctx.getText());
+			joinTables.add(ctx.getText());
 		} else if (ctx.parent instanceof Natural_join_clauseContext) {
-			tables.add(ctx.getText());
+			joinTables.add(ctx.getText());
 		}
 		//System.out.println(ctx.getText());
 	}
@@ -105,6 +126,23 @@ public class DivePlanListener extends DiveBaseListener {
 		bf.stack.push(e);
 	}
 	
+	public void exitColumnName(@NotNull DiveParser.ColumnNameContext ctx) {
+		String colName = ctx.children.get(0).getText();
+		resultColumns.add(new SimpleColumnDescriptor(colName, FieldType.IntType));
+	}
+	
+	public void exitGbcolumn(@NotNull DiveParser.GbcolumnContext ctx) {
+		String tcName = ctx.getText();
+		String[] tc = tcName.split("\\.");
+		String colName = tc[tc.length-1];
+		groupbyColumns.add(new SimpleColumnDescriptor(colName, FieldType.IntType));
+	}
+	
+	public void exitAggregationOperation(@NotNull DiveParser.AggregationOperationContext ctx) {
+		AggFuncColumnDescriptor fcd = new AggFuncColumnDescriptor();
+		fcd.setColumnName(ctx.getText().replaceAll(" \\t", ""));
+		resultColumns.add(fcd);
+	}
 	
 	
 	
