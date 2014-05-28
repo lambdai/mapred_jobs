@@ -8,16 +8,20 @@ import db.table.Schema;
 
 public class TempTableManager {
 	
-	private AtomicInteger index = new AtomicInteger(0);
-	public final String tmpPrefix = "__tmp";
+	private static AtomicInteger index = new AtomicInteger(0);
+	public static final String tmpPrefix = "__tmp";
 	
-	Map<String, Schema> tmpTables = new HashMap<String, Schema>();
+	static Map<String, Schema> tmpTables = new HashMap<String, Schema>();
 	
-	public Schema createTempTable() {
+	public static synchronized Schema createTempTable() {
 		int idx = index.incrementAndGet();
 		String tableName = tmpPrefix+idx;
 		Schema ret = new Schema(tmpPrefix+idx);
 		tmpTables.put(tableName, ret);
 		return ret;
+	}
+	
+	public static synchronized Schema getSchema(String tName) {
+		return tmpTables.get(tName);
 	}
 }
