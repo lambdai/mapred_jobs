@@ -42,6 +42,7 @@ public class Schema {
 		StringBuilder sb = new StringBuilder();
 		for(ColumnDescriptor cd: recordDescriptor) {
 			sb.append(cd.toString());
+			sb.append(Constant.COLUMN_SPLIT);
 		}
 		return sb.toString();
 	}
