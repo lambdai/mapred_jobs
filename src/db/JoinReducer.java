@@ -26,17 +26,11 @@ public class JoinReducer extends Reducer<BytesWritable, BytesWritable, BytesWrit
 	public void setup(Context context) {
 		Configuration conf = context.getConfiguration();
 		String join_using_columns = conf.get(Constant.JOIN_USING);
-		String schema_str = conf.get(Constant.JOIN_RESULT_SCHEMA);
-		String lSchema = conf.get(Constant.LEFT_JOIN_SCHEMA);
-		String rSchema = conf.get(Constant.RIGHT_JOIN_SCHEMA);
 		
-		Schema result_schema = new Schema("join_result");
-		Schema leftSchema = new Schema("left");
-		Schema rightSchema = new Schema("right");
+		Schema result_schema = Schema.createSchema(conf.get(Constant.JOIN_RESULT_SCHEMA));
+		Schema leftSchema = Schema.createSchema(conf.get(Constant.LEFT_JOIN_SCHEMA));
+		Schema rightSchema = Schema.createSchema(conf.get(Constant.RIGHT_JOIN_SCHEMA));
 		
-		result_schema.parseAndSetRecordDescriptor(schema_str);
-		leftSchema.parseAndSetRecordDescriptor(lSchema);
-		rightSchema.parseAndSetRecordDescriptor(rSchema);
 		joinedRow = JoinedRow.createBySchema(result_schema, leftSchema, rightSchema, join_using_columns);
 		factory = new JoinRowFactory();
 		tKey = Constant.EMPTY_BYTESWRITABLE;

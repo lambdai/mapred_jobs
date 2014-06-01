@@ -25,11 +25,14 @@ public class JoinExecuter extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
 		Configuration conf = getConf();
-		//TODO: conf set
-//		conf.set(Constant.LEFT_JOIN_SCHEMA, );
-//		conf.set(Constant.RIGHT_JOIN_SCHEMA, );
-//		conf.set(Constant.JOIN_RESULT_SCHEMA, );
+
+		//TODO: set where filter
+		
+		conf.set(Constant.LEFT_JOIN_SCHEMA, leftSchema.toString());
+		conf.set(Constant.RIGHT_JOIN_SCHEMA, rightSchema.toString());
+		conf.set(Constant.JOIN_RESULT_SCHEMA, outputSchema.toString() );
 		conf.set(Constant.JOIN_USING,  SchemaUtils.dumpColumns(usingColumns));
+
 		
 		Job job = new Job(conf, String.format("%s = %s * %s",
 				outputSchema.getTableName(), leftSchema.getTableName(),
