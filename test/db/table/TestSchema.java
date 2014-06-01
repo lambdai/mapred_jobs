@@ -6,10 +6,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import db.table.ColumnDescriptor;
-import db.table.FieldType;
-import db.table.Schema;
-
 public class TestSchema extends TestCase {
 	
 	String t1 = "t1";
@@ -24,6 +20,17 @@ public class TestSchema extends TestCase {
 		assertEquals(cds.get(1).getColumnName(), "name2");
 		assertEquals(cds.get(1).getOutputFieldType(), FieldType.StringType);
 		assertEquals(cds.get(1).getInputFieldType(), FieldType.StringType);
+	}
+	
+	public void testWholeSchemaSchemaSerialization() {
+		Schema s = new Schema(t1);
+		s.parseAndSetRecordDescriptor(rd1Str);
+		String wholeSchemaString = s.toString();
+		Schema generated = Schema.createSchema(wholeSchemaString);
+		assertEquals(s.toString(), generated.toString());
+		assertEquals(s.getTableName(), generated.getTableName());
+		assertEquals(s.getRecordDescriptor(), generated.getRecordDescriptor());
+		
 	}
 	
 }

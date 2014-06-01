@@ -14,6 +14,7 @@ public interface Constant {
 	final public String OUTPUT_TABLE_SCHEMA = "output_table_schema";
 	public final String AGG_RESULT_SCHEMA = "agg_result_schema";
 	
+	final public String TABLENAME_COLUMNS_SPLIT = ":";
 	final public String COLUMN_SPLIT = ";";
 	final public String COLUMN_NAME_TYPE_SPLIT = ",";
 	
