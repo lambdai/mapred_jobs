@@ -38,7 +38,7 @@ public class RightJoinMapper extends
 			throws IOException, InterruptedException {
 		row.readFieldsFromBytes(value);
 		row.writeToBytes(tKey, keyColumnIndexes);
-		row.writeToBytesWithLeftMark(tValue, valueColumnIndexes);
+		row.writeToBytesWithRightMark(tValue, valueColumnIndexes);
 		context.write(tKey, tValue);
 	}
 
