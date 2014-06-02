@@ -61,6 +61,9 @@ public class Schema {
 	}
 
 	public static Schema createSchema(String schemaString) {
+		if(schemaString == null || schemaString.length() == 0) {
+			return null;
+		}
 		Schema ret = new Schema();
 		int splitOffset = schemaString
 				.indexOf(Constant.TABLENAME_COLUMNS_SPLIT);
