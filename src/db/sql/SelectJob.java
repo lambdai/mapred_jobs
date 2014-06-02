@@ -59,6 +59,9 @@ public class SelectJob {
 		executor.setRightSchema(right);
 		executor.setOutputSchema(ret);
 		executor.setUsingColumns(Schema.columnNames(Schema.equiCols(left, right)));
+		if(w != null) {
+			executor.setWhere(w);
+		}
 		ToolRunner.run(executor, null);
 		return ret;
 	}

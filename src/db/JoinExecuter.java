@@ -11,6 +11,7 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
+import db.sql.BoolExpr;
 import db.table.Schema;
 import db.table.SchemaUtils;
 
@@ -20,6 +21,7 @@ public class JoinExecuter extends Configured implements Tool {
 	private Schema leftSchema;
 	private Schema rightSchema;
 	private Schema outputSchema;
+	private BoolExpr where = null;
 
 	@Override
 	public int run(String[] args) throws Exception {
@@ -31,7 +33,9 @@ public class JoinExecuter extends Configured implements Tool {
 		conf.set(Constant.RIGHT_JOIN_SCHEMA, rightSchema.toString());
 		conf.set(Constant.JOIN_RESULT_SCHEMA, outputSchema.toString());
 		conf.set(Constant.JOIN_USING, SchemaUtils.dumpColumns(usingColumns));
-
+		if(where != null) {
+			conf.set(Constant.WHERE, where.toString());
+		}
 		Job job = new Job(conf, String.format("%s = %s * %s",
 				outputSchema.getTableName(), leftSchema.getTableName(),
 				rightSchema.getTableName()));
@@ -76,4 +80,7 @@ public class JoinExecuter extends Configured implements Tool {
 		this.outputSchema = outputSchema;
 	}
 
+	public void setWhere(BoolExpr where) {
+		this.where = where;
+	}
 }
