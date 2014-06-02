@@ -1,1 +1,1 @@
-select b, AVG(a), SUM(c) from R natural join S where (a = 1) and (b > c) group by b;
+select b, AVG(a), SUM(c) from R natural join S where (a > 3) and (b = c) group by b;
