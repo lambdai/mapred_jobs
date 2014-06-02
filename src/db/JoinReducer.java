@@ -11,9 +11,7 @@ import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import db.sql.BoolExpr;
-import db.sql.BoolExprFactory;
 import db.sql.Evaluator;
-import db.sql.EvaluatorFactory;
 import db.sql.RowEvaluationClosure;
 import db.sql.RowEvaluatorFactory;
 import db.sql.WhereParser;
@@ -34,7 +32,7 @@ public class JoinReducer extends Reducer<BytesWritable, BytesWritable, BytesWrit
 	BytesWritable tKey;
 	BytesWritable tValue;
 	RowEvaluationClosure rowClosure = null;
-	Evaluator evaluator = null;
+	Evaluator whereEvaluator = null;
 	
 	public void setup(Context context) {
 		Configuration conf = context.getConfiguration();
@@ -61,9 +59,10 @@ public class JoinReducer extends Reducer<BytesWritable, BytesWritable, BytesWrit
 		if(whereStr != null) {
 			BoolExpr whereExpr = new WhereParser(whereStr).parseBoolExpr();
 			RowEvaluatorFactory rowEvalFactory = new RowEvaluatorFactory();
+			rowEvalFactory.setClosure(new RowEvaluationClosure());
 			rowClosure = rowEvalFactory.getCloseure();
 			rowClosure.setSchema(result_schema);
-			evaluator = whereExpr.createEvaluator(rowEvalFactory);
+			whereEvaluator = whereExpr.createEvaluator(rowEvalFactory);
 		}
 		
 		joinedRow = JoinedRow.createBySchema(result_schema, leftSchema, rightSchema, join_using_columns);
@@ -104,9 +103,9 @@ public class JoinReducer extends Reducer<BytesWritable, BytesWritable, BytesWrit
 				joinedRow.setCursorOnRight();
 				joinedRow.push(right);
 				joinedRow.writeToBytes(tValue);
-				if(evaluator != null) {
+				if(whereEvaluator != null) {
 					rowClosure.setRow(joinedRow);
-					if(evaluator.evalutate()) {
+					if(whereEvaluator.evalutate()) {
 						context.write(tKey, tValue);
 					}
 				}
