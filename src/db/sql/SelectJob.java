@@ -2,16 +2,20 @@ package db.sql;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.util.ToolRunner;
 
 import db.Constant;
-import db.JoinExecuter;
+import db.JoinExecutor;
 import db.plan.TableManager;
 import db.table.ColumnDescriptor;
 import db.table.Schema;
 
 public class SelectJob {
 
+	public static final Log LOG = LogFactory.getLog(SelectJob.class);
+			
 	public List<ColumnDescriptor> resultColumns;
 	public List<ColumnDescriptor> groupbyColumns;
 	public List<String> joinTables;
@@ -32,6 +36,41 @@ public class SelectJob {
 	public void run() throws Exception {
 		Schema joinedSchema = join();
 		System.out.println(joinedSchema.toString());
+		Schema aggregationSchema = aggregation(joinedSchema);
+		System.out.println(aggregationSchema.toString());
+	}
+
+	private Schema aggregation(Schema inSchema) throws Exception {
+		Schema ret;
+		if(whereDone) {
+			ret = doAggregation(inSchema, groupbyColumns);
+		} else {
+			ret = doAggregation(inSchema, groupbyColumns, where);
+		}
+		return ret;
+	}
+
+	private Schema doAggregation(Schema inSchema,
+			List<ColumnDescriptor> gbColumns) throws Exception {
+		return doAggregation(inSchema, gbColumns, null);
+	}
+
+	private Schema doAggregation(Schema inSchema,
+			List<ColumnDescriptor> gbColumns, BoolExpr whereExpr) throws Exception {
+		Schema ret = TableManager.createTempTable();
+		//TODO: set final result columns
+		ret.setRecordDescriptor(resultColumns);
+		LOG.fatal(ret.toString());
+		
+		GroupbyExecutor executor = new GroupbyExecutor();
+		executor.setOriginSchema(inSchema);
+		executor.setGroupbyColumns(gbColumns);
+		executor.setReducerOutputSchema(ret);
+		if(whereExpr != null) {
+			executor.setWhere(whereExpr);
+		}
+		ToolRunner.run(executor, null);
+		return ret;
 	}
 
 	private Schema join() throws Exception {
@@ -54,7 +93,7 @@ public class SelectJob {
 		Schema ret = TableManager.createTempTable();
 		Schema joined = Schema.natualJoin(left, right);
 		ret.setRecordDescriptor(joined.getRecordDescriptor());
-		JoinExecuter executor = new JoinExecuter();
+		JoinExecutor executor = new JoinExecutor();
 		executor.setLeftSchema(left);
 		executor.setRightSchema(right);
 		executor.setOutputSchema(ret);
@@ -62,7 +101,8 @@ public class SelectJob {
 		if(w != null) {
 			executor.setWhere(w);
 		}
-		ToolRunner.run(executor, null);
+		//TODO: recover this after debug the groupby
+		//ToolRunner.run(executor, null);
 		return ret;
 	}
 
