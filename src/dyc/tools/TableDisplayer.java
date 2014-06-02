@@ -7,6 +7,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.SequenceFile;
 
@@ -67,13 +68,21 @@ public class TableDisplayer {
 		Path path = DbPathUtils.tablePath(tableName);
 		BytesWritable key = new BytesWritable();
 		BytesWritable value = new BytesWritable();
-		FileStatus[] files = fs.listStatus(path);
+		FileStatus[] files = fs.listStatus(path, new PathFilter() {
+
+			@Override
+			public boolean accept(Path path) {
+				return !path.getName().equals("_SUCCESS")
+						&& !path.getName().equals("_logs");
+			}
+
+		});
 		SequenceFile.Reader reader = null;
 		for (FileStatus f : files) {
 			reader = new SequenceFile.Reader(fs, f.getPath(), conf);
 			while (reader.next(key, value)) {
-				nRows --;
-				if(nRows < 0) {
+				nRows--;
+				if (nRows < 0) {
 					reader.close();
 					return;
 				}
