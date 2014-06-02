@@ -28,10 +28,9 @@ public class GroupByMapper extends
 		Configuration conf = cont.getConfiguration();
 		String gb_key_str = conf.get(Constant.AGG_COLUMNS);
 		// get the input table schema
-		String schema_str = conf.get(Constant.INPUT_TABLE_SCHEMA);
+		String schemaStr = conf.get(Constant.INPUT_TABLE_SCHEMA);
 		// schema for the row
-		Schema schema = new Schema("groupby");
-		schema.parseAndSetRecordDescriptor(schema_str);
+		Schema schema = Schema.createSchema(schemaStr);
 		row = Row.createBySchema(schema);
 		// get the group-by-key indexes in the schema  
 		keyColIndxs = Schema.columnIndexes(schema,

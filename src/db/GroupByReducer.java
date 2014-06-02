@@ -1,8 +1,13 @@
 package db;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -19,6 +24,8 @@ import db.table.SchemaUtils;
 
 public class GroupByReducer extends
 		Reducer<BytesWritable, BytesWritable, BytesWritable, BytesWritable> {
+	public static final Log LOG = LogFactory.getLog(GroupByReducer.class);
+	
 	Row outRow; // the row for reduce output
 
 	BytesWritable outKey;
@@ -28,15 +35,16 @@ public class GroupByReducer extends
 	Schema reducerInKeySchema;
 	Schema reducerInValueSchema;
 	Schema aggResultSchema;
+
+	Schema reducerOutputSchema;
 	
 	@Override
 	public void setup(Context context) {
 		Configuration conf = context.getConfiguration();
 
-		String inputSchemaString = conf.get(Constant.INPUT_TABLE_SCHEMA); 
+		String inputSchemaString = conf.get(Constant.INPUT_TABLE_SCHEMA);
 		String groupByKeyString = conf.get(Constant.AGG_COLUMNS);
-		Schema inSchema = new Schema("groupByInput");
-		inSchema.parseAndSetRecordDescriptor(inputSchemaString);
+		Schema inSchema = Schema.createSchema(inputSchemaString);
 		int[] keyIndexes = Schema.columnIndexes(inSchema,
 				SchemaUtils.parseColumns(groupByKeyString));
 		int[] valueIndexes = SchemaUtils.columnLeft(keyIndexes, inSchema
@@ -44,20 +52,28 @@ public class GroupByReducer extends
 		reducerInKeySchema = inSchema.createSubSchema(keyIndexes);
 		reducerInValueSchema = inSchema.createSubSchema(valueIndexes);
 
-		String aggResultSchemaString = conf.get(Constant.AGG_RESULT_SCHEMA);
-		aggResultSchema = new Schema("AggOutput");
-		aggResultSchema.parseAndSetRecordDescriptor(aggResultSchemaString);
-		String reducerOutputSchemaString = conf
-				.get(Constant.OUTPUT_TABLE_SCHEMA);
+
+		reducerOutputSchema = Schema.createSchema(conf
+				.get(Constant.OUTPUT_TABLE_SCHEMA));
 		
+		LOG.fatal(reducerOutputSchema.toString());
 		
-		Schema reducerOutputSchema = new Schema("groupbyReducerOutput");
-		reducerOutputSchema
-				.parseAndSetRecordDescriptor(reducerOutputSchemaString);
 		List<ColumnDescriptor> cds = reducerOutputSchema.getRecordDescriptor();
 		List<AggFuncColumnDescriptor> requiredAggCDs = ColumnDescUtils
 				.filterAggerationCD(cds);
-
+		
+		aggResultSchema = inSchema.createSubSchema(keyIndexes);
+		aggResultSchema.setTableName("AGG_RESULT");
+		List<ColumnDescriptor> list = aggResultSchema.getRecordDescriptor();
+		for(ColumnDescriptor cd: requiredAggCDs) {
+			list.add(cd);
+		}
+		LOG.fatal(aggResultSchema);
+		
+//		for(AggFuncColumnDescriptor acd: requiredAggCDs) {
+//			LOG.fatal(acd.toString());
+//		}
+		
 		AggRowFactory factory = new AggRowFactory();
 		factory.setRequiredCDs(requiredAggCDs);
 		factory.setInputRowSchema(reducerInValueSchema);
@@ -71,30 +87,39 @@ public class GroupByReducer extends
 	@Override
 	protected void reduce(BytesWritable key, Iterable<BytesWritable> values,
 			Context context) throws IOException, InterruptedException {
-		
+
+		Row inKeyRow = Row.createBySchema(reducerInKeySchema);
 		Row inValueRow = Row.createBySchema(reducerInValueSchema);
-		
+
 		acc.init();
-		for(BytesWritable inValue : values) {
+		for (BytesWritable inValue : values) {
 			inValueRow.readFieldsFromBytes(inValue);
-			acc.accept(inValueRow);			
+			acc.accept(inValueRow);
 		}
 		Row aggColumnRow = acc.submitRow();
-		
+
 		Row keysRow = Row.createBySchema(reducerInKeySchema);
+		keysRow.readFieldsFromBytes(key);
 		
 		Row aggResultRow = Row.createBySchema(aggResultSchema);
 		int nKeyColumn = keysRow.getFields().length;
-		for(int i = 0; i < nKeyColumn; i++) {
+		for (int i = 0; i < nKeyColumn; i++) {
 			aggResultRow.setField(keysRow.getFields()[i], i);
 		}
 		Field[] aggResultColumn = aggColumnRow.getFields();
-		for(int i = 0; i < aggResultColumn.length; i++) {
-			aggResultRow.setField(keysRow.getFields()[i], i+nKeyColumn);
+		for (int i = 0; i < aggResultColumn.length; i++) {
+			aggResultRow.setField(aggResultColumn[i], i + nKeyColumn);
 		}
-		//TODO: filter some keys
+		// TODO: filter some keys
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		DataOutputStream out = new DataOutputStream(bout);
 		
-		aggResultRow.writeToBytes(outValue);
+		inKeyRow.write(out);
+		aggResultRow.write(out);
+		out.flush();
+		byte[] result = bout.toByteArray();
+		outValue.set(result, 0, result.length);
+		
 		context.write(outKey, outValue); // output
 	}
 
