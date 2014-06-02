@@ -26,9 +26,9 @@ public class Dive {
 		schema1.parseAndSetRecordDescriptor("{SimpleColumnDescriptor a 1};{SimpleColumnDescriptor b 1}");
 		TableManager.putSchema(schema1);
 		Schema schema2 = new Schema("S");
-		schema1.parseAndSetRecordDescriptor("{SimpleColumnDescriptor b 1};{SimpleColumnDescriptor c 1}");
+		schema2.parseAndSetRecordDescriptor("{SimpleColumnDescriptor b 1};{SimpleColumnDescriptor c 1}");
 		Schema schema3 = new Schema("T");
-		schema1.parseAndSetRecordDescriptor("{SimpleColumnDescriptor c 1};{SimpleColumnDescriptor d 1}");
+		schema3.parseAndSetRecordDescriptor("{SimpleColumnDescriptor c 1};{SimpleColumnDescriptor d 1}");
 		TableManager.putSchema(schema1);
 		TableManager.putSchema(schema2);
 		TableManager.putSchema(schema3);
@@ -53,7 +53,7 @@ public class Dive {
 
 	public void createSelectJob(List<ColumnDescriptor> resultColumns,
 			List<ColumnDescriptor> groupbyColumns, List<String> joinTables,
-			BoolExpr where) {
+			BoolExpr where) throws Exception {
 		selectJob = new SelectJob(resultColumns, groupbyColumns, joinTables, where);
 		selectJob.run();
 	}
