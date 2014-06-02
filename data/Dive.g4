@@ -298,8 +298,13 @@ locals [
  : K_SELECT rcol+=result_column ( ',' rcol+=result_column )*
    K_FROM table_name natural_join_clause 
    ( K_WHERE boolexpr )?
-   ( K_GROUP K_BY expr ( ',' expr )* ( K_HAVING expr )? )?
+   ( K_GROUP K_BY gbcolumn ( ',' gbcolumn )* ( K_HAVING expr )? )?
  ;
+
+gbcolumn
+ : (table_name '.' )? column_name
+ ;
+
 
 compound_operator
  : K_UNION

@@ -12,6 +12,9 @@ public interface Constant {
 	//for schema
 	public final String INPUT_TABLE_SCHEMA = "input_table_schema";	
 	final public String OUTPUT_TABLE_SCHEMA = "output_table_schema";
+	public final String AGG_RESULT_SCHEMA = "agg_result_schema";
+	
+	final public String TABLENAME_COLUMNS_SPLIT = ":";
 	final public String COLUMN_SPLIT = ";";
 	final public String COLUMN_NAME_TYPE_SPLIT = ",";
 	
@@ -28,6 +31,7 @@ public interface Constant {
 	public final String OR_EXPR = "OR";
 	public final String NOT_EXPR = "NOT";
 	public final String BOOL_VALUE_EXPR = "BVAL";
+	
 	
 	
 	public static final byte IntTypeId = 1;

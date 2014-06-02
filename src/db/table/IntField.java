@@ -100,4 +100,8 @@ public class IntField implements Field {
 	public void setValue(int val){	// added by ZX, plz mod/rmv if needed
 		this.value=val;
 	}
+	
+	public int getValue() {
+		return value;
+	}
 }
