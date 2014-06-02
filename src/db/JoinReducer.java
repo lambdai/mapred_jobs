@@ -69,14 +69,14 @@ public class JoinReducer extends Reducer<BytesWritable, BytesWritable, BytesWrit
 			if(markField.equals(Row.fieldMarkLeft)) {
 				currentList = leftRows;
 				row = Row.createBySchema(leftValueSchema);
-				LOG.fatal("LEFT : " + joinedRow.getFields()[0].toString());
+				//LOG.fatal("LEFT : " + joinedRow.getFields()[0].toString());
 			} else {
 				currentList = rightRows;
 				row = Row.createBySchema(rightValueSchema);
-				LOG.fatal("RIGHT: " + joinedRow.getFields()[0].toString());
+				//LOG.fatal("RIGHT: " + joinedRow.getFields()[0].toString());
 			}
 			factory.readRemaining(row);
-			LOG.fatal(row.getFields()[0].toString());
+			//LOG.fatal(row.getFields()[0].toString());
 			currentList.add(row);
 		}
 		

@@ -41,7 +41,7 @@ public class LeftJoinMapper extends
 	public void map(BytesWritable key, BytesWritable value, Context context)
 			throws IOException, InterruptedException {
 		row.readFieldsFromBytes(value);
-		LOG.fatal(row.toString());
+		//LOG.fatal(row.toString());
 		row.writeToBytes(tKey, keyColumnIndexes);
 		row.writeToBytesWithLeftMark(tValue, valueColumnIndexes);
 		context.write(tKey, tValue);
