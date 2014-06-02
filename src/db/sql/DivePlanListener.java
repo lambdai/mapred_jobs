@@ -57,7 +57,12 @@ public class DivePlanListener extends DiveBaseListener {
 	@Override
 	public void exitSelect_core(@NotNull DiveParser.Select_coreContext ctx) {
 		where = bf.stack.pop();
-		dive.createSelectJob(resultColumns, groupbyColumns, joinTables, where);
+		try {
+			dive.createSelectJob(resultColumns, groupbyColumns, joinTables, where);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 	
 	@Override
