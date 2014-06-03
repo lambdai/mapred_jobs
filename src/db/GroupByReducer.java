@@ -38,6 +38,7 @@ public class GroupByReducer extends
 
 	Schema reducerOutputSchema;
 	
+	ProjectPipe projectPipe;
 	@Override
 	public void setup(Context context) {
 		Configuration conf = context.getConfiguration();
@@ -74,6 +75,7 @@ public class GroupByReducer extends
 //			LOG.fatal(acd.toString());
 //		}
 		
+		
 		AggRowFactory factory = new AggRowFactory();
 		factory.setRequiredCDs(requiredAggCDs);
 		factory.setInputRowSchema(reducerInValueSchema);
@@ -82,6 +84,7 @@ public class GroupByReducer extends
 		outKey = Constant.EMPTY_BYTESWRITABLE;
 		outValue = new BytesWritable();
 
+		projectPipe = new ProjectPipe(aggResultSchema, reducerOutputSchema);
 	}
 
 	@Override
@@ -110,16 +113,19 @@ public class GroupByReducer extends
 		for (int i = 0; i < aggResultColumn.length; i++) {
 			aggResultRow.setField(aggResultColumn[i], i + nKeyColumn);
 		}
-		// TODO: filter some keys
+		
+		/*
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		DataOutputStream out = new DataOutputStream(bout);
-		
-		inKeyRow.write(out);
 		aggResultRow.write(out);
 		out.flush();
 		byte[] result = bout.toByteArray();
 		outValue.set(result, 0, result.length);
-		
+		 */
+		projectPipe.write(aggResultRow);
+		Row result = projectPipe.read();
+		result.writeToBytes(outValue);
+		LOG.fatal(result.toString());
 		context.write(outKey, outValue); // output
 	}
 
