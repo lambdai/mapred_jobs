@@ -1,0 +1,1 @@
+select b, COUNT(a), SUM(c) from R natural join S where (b >= 3) and (a < c) group by b;
