@@ -10,6 +10,10 @@ public class WhereParser {
 
 	String str;
 	int start, end, icurrent;
+	
+	public WhereParser(String str) {
+		this(str, 0, str.length()-1);
+	}
 
 	public WhereParser(String str, int start, int end) {
 		this.str = str;

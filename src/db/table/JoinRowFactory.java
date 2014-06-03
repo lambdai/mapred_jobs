@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.apache.hadoop.io.BytesWritable;
 
 public class JoinRowFactory {
-	IntField markField;
+	IntField markField = new IntField(-1);
 	DataInput in;
 
 	// convert bytes stream to field

@@ -20,8 +20,8 @@ public class AggregationUtils {
 	public static synchronized AggregationFunction createFunctionInstance(String fName) {
 		AggregationFunction ret;
 		try {
-			System.out.println(fName);
-			System.out.println(get(fName).getSimpleName());
+			//System.out.println(fName);
+			//System.out.println(get(fName).getSimpleName());
 			ret = (AggregationFunction) get(fName).getConstructor().newInstance();
 		} catch (Exception e) {
 			throw new RowFormatException(fName);

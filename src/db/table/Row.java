@@ -190,4 +190,15 @@ public class Row /*implements WritableComparable<Row>*/ {
 	public void setField(Field fd, int index){	//added by ZX, mod/rmv if needed
 		fields[index]=fd;
 	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append('{');
+		for(Field f : fields) {
+			sb.append(f.toString());
+			sb.append(';');
+		}
+		sb.setCharAt(sb.length()-1, '}');
+		return sb.toString();
+	}
 }

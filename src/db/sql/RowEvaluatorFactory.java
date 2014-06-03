@@ -6,7 +6,7 @@ import java.util.List;
 import db.table.Schema;
 import db.table.UnsupportedOperation;
 
-public class RowEvalutorFactory {
+public class RowEvaluatorFactory implements EvaluatorFactory {
 	private RowEvaluationClosure closure;
 	
 	public Evaluator create(BoolValue boolOperation) {
@@ -17,8 +17,8 @@ public class RowEvalutorFactory {
 		return closure;
 	}
 
-	public void setCloseure(RowEvaluationClosure closeure) {
-		this.closure = closeure;
+	public void setClosure(RowEvaluationClosure closure) {
+		this.closure = closure;
 	}
 
 	private Evaluator create(PredicateOperand left, PredicateOperand right,

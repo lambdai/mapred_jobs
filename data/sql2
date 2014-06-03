@@ -1,0 +1,1 @@
+select c, MAX(b) from S  where (b >= 2) and (b < c) group by c;

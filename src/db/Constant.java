@@ -24,6 +24,7 @@ public interface Constant {
 	final public String RIGHT_JOIN_SCHEMA = "right_join_schema";
 	final public String JOIN_RESULT_SCHEMA = "result_join_schema";
 	
+	final public String WHERE = "where";
 	
 	
 	final public Text EMPTY_TEXT= new Text("");

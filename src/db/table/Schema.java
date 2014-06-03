@@ -61,6 +61,9 @@ public class Schema {
 	}
 
 	public static Schema createSchema(String schemaString) {
+		if(schemaString == null || schemaString.length() == 0) {
+			return null;
+		}
 		Schema ret = new Schema();
 		int splitOffset = schemaString
 				.indexOf(Constant.TABLENAME_COLUMNS_SPLIT);
@@ -100,6 +103,14 @@ public class Schema {
 		}
 		return equiCols;
 	}
+	
+	public static List<String> columnNames(List<ColumnDescriptor> list) {
+		List<String> ret = new ArrayList<String>(list.size());
+		for(ColumnDescriptor cd: list) {
+			ret.add(cd.getColumnName());
+		}
+		return ret;
+	}
 
 	public Schema createSubSchema(int[] subset) {
 		Schema ret = new Schema("tmp");
@@ -119,7 +130,7 @@ public class Schema {
 	public static Schema natualJoin(Schema schema1, Schema schema2,
 			List<ColumnDescriptor> on) throws UnsupportedOperationException {
 		Schema ret = new Schema("natualjoin");
-		if (!schema1.isValid() || schema2.isValid()) {
+		if (!schema1.isValid() || !schema2.isValid()) {
 			throw (new UnsupportedOperationException("invalid Schema"));
 		}
 

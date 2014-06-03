@@ -8,53 +8,60 @@ import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
+import db.sql.BoolExpr;
 import db.table.Schema;
 import db.table.SchemaUtils;
 
-public class JoinExecuter extends Configured implements Tool {
+public class JoinExecutor extends Configured implements Tool {
 
-	
 	private List<String> usingColumns;
 	private Schema leftSchema;
 	private Schema rightSchema;
 	private Schema outputSchema;
+	private BoolExpr where = null;
 
 	@Override
 	public int run(String[] args) throws Exception {
 		Configuration conf = getConf();
 
-		//TODO: set where filter
-		
 		conf.set(Constant.LEFT_JOIN_SCHEMA, leftSchema.toString());
 		conf.set(Constant.RIGHT_JOIN_SCHEMA, rightSchema.toString());
-		conf.set(Constant.JOIN_RESULT_SCHEMA, outputSchema.toString() );
-		conf.set(Constant.JOIN_USING,  SchemaUtils.dumpColumns(usingColumns));
-
-		
+		conf.set(Constant.JOIN_RESULT_SCHEMA, outputSchema.toString());
+		conf.set(Constant.JOIN_USING, SchemaUtils.dumpColumns(usingColumns));
+		if(where != null) {
+			conf.set(Constant.WHERE, where.toString());
+		}
 		Job job = new Job(conf, String.format("%s = %s * %s",
 				outputSchema.getTableName(), leftSchema.getTableName(),
 				rightSchema.getTableName()));
 		job.setJarByClass(getClass());
-		
-		
+
 		MultipleInputs.addInputPath(job, DbPathUtils.tablePath(leftSchema),
 				SequenceFileInputFormat.class, LeftJoinMapper.class);
 
 		MultipleInputs.addInputPath(job, DbPathUtils.tablePath(rightSchema),
 				SequenceFileInputFormat.class, RightJoinMapper.class);
-		
+
 		job.setReducerClass(JoinReducer.class);
-	    FileOutputFormat.setOutputPath(job, DbPathUtils.tablePath(outputSchema));
+
+		job.setNumReduceTasks(2);
+
+		job.setMapOutputKeyClass(BytesWritable.class);
+		job.setMapOutputValueClass(BytesWritable.class);
+
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
+		SequenceFileOutputFormat.setOutputPath(job,
+				DbPathUtils.tablePath(outputSchema));
+
 		job.setOutputKeyClass(BytesWritable.class);
-		job.setOutputKeyClass(BytesWritable.class);
-		
+		job.setOutputValueClass(BytesWritable.class);
+
 		return job.waitForCompletion(true) ? 0 : 1;
 	}
-	
-	
+
 	public void setUsingColumns(List<String> usingColumns) {
 		this.usingColumns = usingColumns;
 	}
@@ -71,4 +78,7 @@ public class JoinExecuter extends Configured implements Tool {
 		this.outputSchema = outputSchema;
 	}
 
+	public void setWhere(BoolExpr where) {
+		this.where = where;
+	}
 }
