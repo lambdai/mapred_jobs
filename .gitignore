@@ -1,4 +1,10 @@
+# Java and ANTLR
 *.class
+*.tokens
+
+# LaTex temporary files
+*.log
+*.aux
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
