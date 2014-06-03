@@ -58,7 +58,7 @@ public class SelectJob {
 	private Schema doAggregation(Schema inSchema,
 			List<ColumnDescriptor> gbColumns, BoolExpr whereExpr) throws Exception {
 		Schema ret = TableManager.createTempTable();
-		//TODO: set final result columns
+		
 		ret.setRecordDescriptor(resultColumns);
 		LOG.fatal(ret.toString());
 		
@@ -101,8 +101,8 @@ public class SelectJob {
 		if(w != null) {
 			executor.setWhere(w);
 		}
-		//TODO: recover this after debug the groupby
-		//ToolRunner.run(executor, null);
+		
+		ToolRunner.run(executor, null);
 		return ret;
 	}
 
