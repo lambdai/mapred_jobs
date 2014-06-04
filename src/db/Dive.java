@@ -34,6 +34,11 @@ public class Dive {
 		TableManager.putSchema(schema3);
 	}
 	
+	public void submitTable(Schema schema) {
+		System.out.println(schema.toString());
+		TableManager.putSchema(schema);
+	}
+	
 	public static void main(String args[]) throws IOException {
 		
 		initTables();

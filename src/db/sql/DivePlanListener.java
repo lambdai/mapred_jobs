@@ -13,6 +13,8 @@ import db.syntax.DiveParser.Select_coreContext;
 import db.table.AggFuncColumnDescriptor;
 import db.table.ColumnDescriptor;
 import db.table.FieldType;
+import db.table.RowFormatException;
+import db.table.Schema;
 import db.table.SimpleColumnDescriptor;
 
 public class DivePlanListener extends DiveBaseListener {
@@ -27,6 +29,37 @@ public class DivePlanListener extends DiveBaseListener {
 	private PredicateExprFactory pf = new PredicateExprFactory();
 	
 	private Dive dive;
+	
+	
+	private Schema schema = null;
+
+    public Schema getSchema() { return schema; }
+
+    @Override
+    public void exitCreate_table_stmt(@NotNull DiveParser.Create_table_stmtContext ctx) {
+        // Extract table name
+    	schema = new Schema(ctx.table_name().getText());
+
+        // Extract list of column definitions
+        List<ColumnDescriptor> recordDescriptor = new ArrayList<ColumnDescriptor>();
+        for (int i = 0; i < ctx.column_def().size(); i++) {
+            String columnName = ctx.column_def(i).column_name().any_name().IDENTIFIER().getText();
+            String typeName = ctx.column_def(i).type_name().name(0).any_name().IDENTIFIER().getText();
+            // Convert type name to our own enum type
+            FieldType fieldType;
+            if (typeName.equals("int") || typeName.equals("smallint")) {
+                fieldType = FieldType.IntType;
+            }
+            else if (typeName.equals("char") || typeName.equals("varchar")) {
+                fieldType = FieldType.StringType;
+            } else {
+            	throw new RowFormatException(ctx.getText());
+            }
+            recordDescriptor.add(new SimpleColumnDescriptor(columnName, fieldType));
+        }
+        schema.setRecordDescriptor(recordDescriptor);
+        dive.submitTable(schema);
+    }
 	
 	public DivePlanListener(Dive dive) {
 		this.dive = dive;
