@@ -1,1 +1,5 @@
+create table R ( a int, b int);
+create table S ( b int, c int);
+create table T ( c int, d int);
+create table U ( d int, e int, f int);
 select b, AVG(a), SUM(c) from R natural join S where (a > 3) and (b = c) group by b;
