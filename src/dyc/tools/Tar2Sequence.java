@@ -45,20 +45,29 @@ public class Tar2Sequence {
 		// BufferedInputStream in = new BufferedInputStream(fin);
 		// FileOutputStream out = new FileOutputStream("archive.tar");
 		// GzipCompressorInputStream gzIn = new GzipCompressorInputStream(in);
-		
-		if(args.length == 0 || args[0].equals("--help")) {
-			System.out.println("Usage: " + Tar2Sequence.class.getCanonicalName() + "input_tar_file" + " output_files_prefix" + " chunksize");
+
+		if (args.length == 0 || args[0].equals("--help")) {
+			System.out.println("Usage: "
+					+ Tar2Sequence.class.getCanonicalName() + "input_tar_file"
+					+ " output_dir" + " classifier" + " chunksize");
 		}
 		Configuration conf = new Configuration();
 		Text key = new Text();
 
 		Text value = new Text();
 		SequenceFile.Writer writer = null;
-		
-		int maxChunkSize = Integer.parseInt(args[2]);
+
+		String outputDir = args[1];
+		String classifier = args[2];
+		int maxChunkSize = Integer.parseInt(args[3]);
 		int currentChunkSize = 0;
 		int currentChunkIndex = 1;
-		writer = SequenceFile.createWriter(conf, SequenceFile.Writer.compression(CompressionType.NONE), Writer.file(new Path(args[1] + String.format("%05d", currentChunkIndex))), SequenceFile.Writer.keyClass(key.getClass()),
+		writer = SequenceFile.createWriter(
+				conf,
+				SequenceFile.Writer.compression(CompressionType.NONE),
+				Writer.file(new Path(outputDir + "/chunk"
+						+ String.format("%05d", currentChunkIndex))),
+				SequenceFile.Writer.keyClass(key.getClass()),
 				SequenceFile.Writer.valueClass(value.getClass()));
 
 		TarArchiveInputStream tarIn = new TarArchiveInputStream(
@@ -71,15 +80,22 @@ public class Tar2Sequence {
 			if (tarEntry.isDirectory()) {
 				// destPath.mkdirs();
 			} else {
-				if(currentChunkSize > maxChunkSize) {
+				if (currentChunkSize > maxChunkSize) {
 					writer.close();
 					currentChunkSize = 0;
-					currentChunkIndex ++;
-					writer = SequenceFile.createWriter(conf, SequenceFile.Writer.compression(CompressionType.NONE), Writer.file(new Path(args[1] + String.format("%05d", currentChunkIndex))), SequenceFile.Writer.keyClass(key.getClass()),
+					currentChunkIndex++;
+					writer = SequenceFile.createWriter(conf,
+							SequenceFile.Writer
+									.compression(CompressionType.NONE), Writer
+									.file(new Path(outputDir
+											+ "/chunk"
+											+ String.format("%05d",
+													currentChunkIndex))),
+							SequenceFile.Writer.keyClass(key.getClass()),
 							SequenceFile.Writer.valueClass(value.getClass()));
 				}
 				System.out.println(tarEntry.getName());
-				key.set(tarEntry.getName());
+				key.set(classifier + "/" + tarEntry.getName().replace('/', '_'));
 				BufferedReader breader = new BufferedReader(
 						new InputStreamReader(tarIn, getCharset()));
 				StringBuilder sb = new StringBuilder();
@@ -95,7 +111,7 @@ public class Tar2Sequence {
 				value.set(sb.toString());
 				writer.append(key, value);
 				currentChunkSize += (key.getLength() + value.getLength());
-				
+
 				// we can not close breader
 				// breader.close();
 
