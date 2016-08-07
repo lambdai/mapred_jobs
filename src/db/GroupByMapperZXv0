@@ -1,0 +1,55 @@
+import java.io.*;
+import java.util.*;
+import org.apache.hadoop.conf.*;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapreduce.*;
+
+public class GroupByMapperZXv0 extends Mapper<Writable, Text,Text,Text>{
+	private ArrayList<Integer> keyIndx;	//	index of key in a record for group by
+	private ArrayList<Integer> valIndx;	//	index of values in a record for group by
+	
+	@Override
+	public void setup(Context cont) throws IOException, InterruptedException{
+		Configuration conf= cont.getConfiguration();
+		String gb_key_str=conf.get("Constant.AGG_COLUMN_ID"); // guessing these are keys for group by
+		String schema_str=conf.get("Constant.GROUP_BY_SCHEMA"); // still guessing the schema
+		// Is a new Schema instance needed? maybe talk about the Schema class
+		String[] fields=schema_str.split(" "); // Delimiter is space, separate fields in the schema
+		String[] keys=gb_key_str.split(" "); // Separate fields in given keys 
+		boolean[] isKey=new boolean[fields.length];
+		//get the index of keys in the schema
+		for(String strKey:keys){	// for each given key
+			for(int i=0;i<fields.length;i++){	// compare key to each field
+				if(strKey.equals(fields[i])){	
+					keyIndx.add(i);
+					isKey[i]=true;	// mark fields used as key
+					break;
+				}
+			}
+		}
+		for(int i=0;i<fields.length;i++){
+			if(!isKey[i])
+				valIndx.add(i);	// add the non-key field's index into the list
+		}
+	}
+	
+	@Override
+	public void map(Writable key, Text value, Context cont) throws IOException, InterruptedException{
+		String line = value.toString();	// a record
+		String[] fields=line.split(" ");// split into fields
+		String outputKey="";	// output key
+		String outputVal="";	// output value
+		
+		for(int i:keyIndx){
+			outputKey.concat(fields[keyIndx.get(i)]);	//	add each key into the string
+		}
+		
+		for(int i:valIndx){
+			outputVal.concat(fields[valIndx.get(i)]);	// add each val into the string
+		}
+		
+		cont.write(new Text(outputKey), new Text(outputVal));	// emitting
+	}
+		
+}
+	
